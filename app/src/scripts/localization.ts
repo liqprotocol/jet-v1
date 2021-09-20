@@ -114,7 +114,9 @@ export const dictionary: any = {
     nav: {
       cockpit: "Cockpit",
       settings: "Settings",
-      collapse: "Collapse"
+      collapse: "Collapse",
+      getCopilotSuggestion: "Get Copilot Suggestion",
+      disconnectWallet: "Disconnect Wallet"
     },
     cockpit: {
       title: "Cockpit",
@@ -126,8 +128,8 @@ export const dictionary: any = {
       availableLiquidity: "Available Liquidity",
       amountDeposited: "Deposited",
       amountBorrowed: "Borrowed",
-      depositAPY: "Deposit APY",
-      borrowAPR: "Borrow APR",
+      depositRate: "Deposit Rate",
+      borrowRate: "Borrow Rate",
       airdrop: "Airdrop",
       totalDepositedValue: "Your Deposited Value",
       totalBorrowedValue: "Your Borrowed Value",
@@ -241,7 +243,9 @@ export const dictionary: any = {
     nav: {
       cockpit: "驾驶舱",
       settings: "设定",
-      collapse: "缩起"
+      collapse: "缩起",
+      getCopilotSuggestion: "",
+      disconnectWallet: ""
     },
     cockpit: {
       title: "驾驶舱",
@@ -253,8 +257,8 @@ export const dictionary: any = {
       availableLiquidity: "可用流动性",
       amountDeposited: "存款金额",
       amountBorrowed: "借贷金额",
-      depositAPY: "存款 APY",
-      borrowAPR: "借贷 APR",
+      depositRate: "存款 APY",
+      borrowRate: "借贷 APR",
       airdrop: "Airdrop",
       totalDepositedValue: "存款总价值",
       totalBorrowedValue: "借贷总额",
@@ -368,7 +372,9 @@ export const dictionary: any = {
     nav: {
       cockpit: "Кабина",
       settings: "Настройки",
-      collapse: "Свернуть"
+      collapse: "Свернуть",
+      getCopilotSuggestion: "",
+      disconnectWallet: ""
     },
     cockpit: {
       title: "Кабина",
@@ -380,8 +386,8 @@ export const dictionary: any = {
       availableLiquidity: "Доступная ликвидность",
       amountDeposited: "Депозит",
       amountBorrowed: "Займ",
-      depositAPY: "ГПД депозита",
-      borrowAPR: "ГПС займа",
+      depositRate: "ГПД депозита",
+      borrowRate: "ГПС займа",
       airdrop: "Airdrop",
       totalDepositedValue: "Сумма ваших депозитов",
       totalBorrowedValue: "Сумма ваших займов",
@@ -495,7 +501,9 @@ export const dictionary: any = {
     nav: {
       cockpit: "Kokpit",
       settings: "Ayarlar",
-      collapse: "Kollaps"
+      collapse: "Kollaps",
+      getCopilotSuggestion: "",
+      disconnectWallet: ""
     },
     cockpit: {
       title: "Kokpit",
@@ -507,8 +515,8 @@ export const dictionary: any = {
       availableLiquidity: "Uygun Likidite",
       amountDeposited: "Yatırılan",
       amountBorrowed: "Ödünç alınmış",
-      depositAPY: "Yatırma APY'si",
-      borrowAPR: "Borç alma APY'si",
+      depositRate: "Yatırma APY'si",
+      borrowRate: "Borç alma APY'si",
       airdrop: "Airdrop",
       totalDepositedValue: "Yatırılan varlık değeriniz",
       totalBorrowedValue: "Ödünç Aldığınız Varlık",
@@ -633,12 +641,12 @@ export const definitions: any = {
       term: "Adjusted Collateralization Ratio",
       definition: "A real-time representation of what your collateralization ratio would potentially be if the current trade is submitted."
     },
-    depositAPY: {
-      term: "Deposit interest rate",
+    depositRate: {
+      term: "Deposit Interest Rate",
       definition: "The instantaneous interest rate being earned by depositors. This rate is expressed in annualized form, does not reflect the effects of compounding, and is inclusive of any protocol fees that may be in place. The rate changes as the utilization ratio of the deposited asset changes."
     },
-    borrowAPR: {
-      term: "Borrow interest rate",
+    borrowRate: {
+      term: "Borrow Interest Rate",
       definition: "The instantaneous interest rate being paid by borrowers. This rate is expressed in annualized form, does not reflect the effects of compounding, and is inclusive of any protocol fees that may be in place. The rate changes as the utilization ratio of the borrowed asset changes."
     },
     maximumLtv: {
@@ -675,11 +683,11 @@ export const definitions: any = {
       term: "调整后的质押率",
       definition: "如果這筆交易成功後的实时质押率"
     },
-    depositAPY: {
+    depositRate: {
       term: "存款 APY",
       definition: "假设您全年不添加或提取资金，您在存款账户中赚取的利息总额年化百分比收益率 (APY) 包括您的利率和复利频率，即您从本金中加上您的收入利息赚取的利息"
     },
-    borrowAPR: {
+    borrowRate: {
       term: "借贷 APR",
       definition: "一年上的贷款收取的年化百分比率 (APR)。 这考虑了贷款期间复利的影响，它反映了先前累积利息也赚取的利息"
     },
@@ -717,11 +725,11 @@ export const definitions: any = {
       term: "Скорректированный коэффициент обеспечения",
       definition: "Прогноз в реальном времени того, каким примерно будет ваш коэффициент обеспечения, если будет совершена текущая сделка."
     },
-    depositAPY: {
+    depositRate: {
       term: "ГПД депозита",
       definition: "Общая сумма процентов, которые вы зарабатываете на депозитном счете за один год, при условии, что вы не добавляете и не снимаете средства в течение всего года. Годовая процентная доходность (ГПД) включает вашу процентную ставку и частоту начисления сложных процентов, то есть процент, который вы зарабатываете на свою основную сумму, плюс проценты с вашей прибыли."
     },
-    borrowAPR: {
+    borrowRate: {
       term: "ГПС займа",
       definition: "Годовая процентная ставка (ГПС), взимаемая по займу сроком на один год. При этом учитывается эффект начисления сложных процентов в течение периода займа, что означает, что он отражает проценты, и также начисления на ранее начисленные проценты."
     },
@@ -760,11 +768,11 @@ export const definitions: any = {
       term: "Düzeltilmiş Teminat Oranı",
       definition: "Mevcut işlemin sunulması durumunda teminatlandırma oranınızın potansiyel olarak ne olacağının gerçek zamanlı bir temsili."
     },
-    depositAPY: {
+    depositRate: {
       term: "Depozito APY",
       definition: "Tüm yıl boyunca para eklemediğinizi veya çekmediğinizi varsayarsak, bir mevduat hesabında bir yıl boyunca kazandığınız toplam faiz tutarı. Yıllıklandırılmış yüzde getirisi (APY), faiz oranınızı ve anaparanızdan kazandığınız faiz artı kazançlarınızın faizi olan bileşik faiz sıklığını içerir."
     },
-    borrowAPR: {
+    borrowRate: {
       term: "Borç APR",
       definition: "Bir yıl boyunca bir krediye uygulanan yıllık yüzde oranı (APR). Bu, kredi döneminde bileşik faizin etkisini hesaba katar, yani daha önce birikmiş faizle kazanılan faizi de yansıtır."
     },

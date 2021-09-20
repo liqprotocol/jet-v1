@@ -370,7 +370,6 @@
       [ok, txid] = await repay($CURRENT_RESERVE.abbrev, repayAmount);
     }
     
-    
     if (ok && txid) {
       COPILOT.set({
         alert: {
@@ -513,18 +512,18 @@
           {dictionary[$PREFERRED_LANGUAGE].cockpit.availableLiquidity}
         </th>
         <th data-key="depositAPY">
-          {dictionary[$PREFERRED_LANGUAGE].cockpit.depositAPY}
+          {dictionary[$PREFERRED_LANGUAGE].cockpit.depositRate}
           <i class="info far fa-question-circle"
               on:click={() => COPILOT.set({
-                definition: definitions[$PREFERRED_LANGUAGE].depositAPY
+                definition: definitions[$PREFERRED_LANGUAGE].depositRate
               })}>
           </i>
         </th>
         <th data-key="borrowAPR" class="datatable-border-right">
-          {dictionary[$PREFERRED_LANGUAGE].cockpit.borrowAPR}
+          {dictionary[$PREFERRED_LANGUAGE].cockpit.borrowRate}
           <i class="info far fa-question-circle"
               on:click={() => COPILOT.set({
-                definition: definitions[$PREFERRED_LANGUAGE].borrowAPR
+                definition: definitions[$PREFERRED_LANGUAGE].borrowRate
               })}>
           </i>
         </th>

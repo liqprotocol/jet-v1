@@ -65,6 +65,7 @@
       {#if $WALLET && $ASSETS}
         <div class="copilot flex align-center justify-center" 
           class:justify-start={expanded}
+          title={dictionary[$PREFERRED_LANGUAGE].nav.getCopilotSuggestion}
           on:click={() => generateCopilotSuggestion()}>
           <img width="25px" height="auto" 
             src="img/copilot/copilot.png" 
@@ -80,6 +81,7 @@
         </div>
         <div class="wallet flex align-center justify-center"
           class:justify-start={expanded} 
+          title={dictionary[$PREFERRED_LANGUAGE].nav.disconnectWallet}
           on:click={() => disconnectWallet()}>
           <img width="25px" height="auto" 
             src={`img/wallets/${$WALLET.name.replace(' ', '_').toLowerCase()}.png`} 
@@ -127,7 +129,7 @@
   </div>
   <div class="bottom flex align-center justify-evenly">
     {#if $WALLET && $ASSETS}
-      <div class="copilot flex align-center justify-center" 
+      <div class="copilot flex align-center justify-center"
         on:click={() => generateCopilotSuggestion()}>
         <img width="100%" height="auto" 
           src="img/copilot/copilot.png" 
