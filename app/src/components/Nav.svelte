@@ -89,8 +89,7 @@
           />
           {#if expanded}
             <span class="text-gradient">
-              {$WALLET.publicKey.toString().substring(0, 4)}..
-              {$WALLET.publicKey.toString().substring(
+              {$WALLET.publicKey.toString().substring(0, 4)}...{$WALLET.publicKey.toString().substring(
                 $WALLET.publicKey.toString().length - 4
               )}
             </span>
