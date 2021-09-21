@@ -1,3 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap');
+@font-face {
+  font-family: 'Bicyclette';
+  src: url("./fonts/Bicyclette-Regular.woff") format('woff');
+}
+@font-face {
+  font-family: 'Bicyclette-Bold';
+  src: url("./fonts/Bicyclette-Bold.woff") format('woff');
+}
+@font-face {
+  font-family: 'Jet-Icons';
+  src: url("./fonts/JetIcons-Regular.woff") format('woff');
+}
+
 /* General styling & root variables */
 :root {
   --black: #444444;
@@ -37,19 +51,6 @@
   --round-radius: 50px;
   --btn-radius: 7px;
   --btn-padding: 7px 20px 5px 20px;
-}
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
-@font-face {
-  font-family: 'Bicyclette';
-  src: url("./fonts/Bicyclette-Regular.woff") format('woff');
-}
-@font-face {
-  font-family: 'Bicyclette-Bold';
-  src: url("./fonts/Bicyclette-Bold.woff") format('woff');
-}
-@font-face {
-  font-family: 'Jet-Icons';
-  src: url("./fonts/JetIcons-Regular.woff") format('woff');
 }
 body {
 	margin: 0;
@@ -266,19 +267,19 @@ input[type=number] {
   margin: var(--spacing-md) var(--spacing-lg);
 }
 .view-title {
-  font-family: 'Bicyclette', 'Roboto'; 
+  font-family: 'Bicyclette', 'Roboto', sans-serif; 
   font-size: 26px;
   letter-spacing: 5px;
   margin: var(--spacing-md) 0 0 0;
 }
 .view-header {
-  font-family: 'Bicyclette-Bold', 'Roboto'; 
+  font-family: 'Bicyclette-Bold', 'Roboto', sans-serif; 
   font-size: 90px;
   line-height: 105px;
   opacity: 1;
 }
 .view-header span {
-  font-family: 'Bicyclette-Bold', 'Roboto'; 
+  font-family: 'Bicyclette-Bold', 'Roboto', sans-serif; 
   font-size: 30px;
   line-height: 35px;
   position: absolute;
@@ -443,7 +444,7 @@ input[type=number] {
 }
 .datatable td.reserve-detail {
   font-size: 12px !important;
-  font-family: 'Bicyclette-Bold', 'Roboto';
+  font-family: 'Bicyclette-Bold', 'Roboto', sans-serif;
   text-transform: uppercase;
   background-image: var(--gradient) !important;
   -webkit-background-clip: text !important;
