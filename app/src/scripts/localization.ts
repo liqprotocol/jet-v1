@@ -246,8 +246,8 @@ export const dictionary: any = {
       cockpit: "驾驶舱",
       settings: "设定",
       collapse: "缩起",
-      getCopilotSuggestion: "",
-      disconnectWallet: ""
+      getCopilotSuggestion: "获取副驾驶建议",
+      disconnectWallet: "断开钱包"
     },
     cockpit: {
       title: "驾驶舱",
@@ -259,8 +259,8 @@ export const dictionary: any = {
       availableLiquidity: "可用流动性",
       amountDeposited: "存款金额",
       amountBorrowed: "借贷金额",
-      depositRate: "存款 APY",
-      borrowRate: "借贷 APR",
+      depositRate: "存款率",
+      borrowRate: "借贷率",
       airdrop: "Airdrop",
       totalDepositedValue: "存款总价值",
       totalBorrowedValue: "借贷总额",
@@ -294,11 +294,11 @@ export const dictionary: any = {
       assetIsCurrentBorrow: "你已经借了{{ASSET}} 所以无法存入此资产。",
       belowMinCRatio: "您已低于最小质押率。请多存一些抵押物或偿还一些债务。",
       search: "搜索市场",
-      noBalanceForDeposit: "You have no {{ASSET}} in your wallet to deposit.",
+      noBalanceForDeposit: "您钱包里没有任何 {{ASSET}} 来存款.",
       noDepositsForBorrow: "您需要存抵押物才能再借款",
-      noDepositsForWithdraw: "You have not deposited any {{ASSET}} to withdraw.",
-      noDebtForRepay: "You don't owe any {{ASSET}}.",
-      rejectTrade: "This trade would lower your collateralization ratio to {{NEW-C-RATIO}}%, which would be below our minimum ratio of {{JET MIN C-RATIO}}%."
+      noDepositsForWithdraw: "您没有存任何 {{ASSET}} 来提款.",
+      noDebtForRepay: "您不欠任何 {{ASSET}}.",
+      rejectTrade: "这个交易手续会降低您的质押率到 {{NEW-C-RATIO}}%, 而且会比我们的对低质押率限制 {{JET MIN C-RATIO}} 还低."
     },
     settings: {
       title: "设定",
@@ -317,9 +317,9 @@ export const dictionary: any = {
       viewHistory: "查看历史",
       totalBorrowed: "总借贷金额",
       maximumLTV: "最高LTV",
-      minimumCollateralizationRatio: "Minimum C-Ratio",
       liquidationPremium: "清算溢价",
-      tradeAsset: "交易 {{ASSET}}"
+      tradeAsset: "交易 {{ASSET}}",
+      minimumCollateralizationRatio: "最低质押率限制"
     },
     copilot: {
       name: "副驾驶",
@@ -329,7 +329,7 @@ export const dictionary: any = {
         unhealthy: {
           overview: "您的帐号健康度不良",
           detail: "您的质押率 {{C-RATIO}}% 比 Jet 要求的质押率还低 {{RATIO BELOW AMOUNT}}%。Jet 要求的最低质押率是 {{JET MIN C-RATIO}}%",
-          solution: `为了更正您的仓位，您可以存入更多的抵押品，但我建议您在 "驾驶舱" 中偿还您的债务。`,
+          solution: "为了更正您的仓位，您可以存入更多的抵押品，但我建议您在 \"驾驶舱\" 中偿还您的债务。,
           actionText: "去驾驶舱"
         },
         warning: {
@@ -348,7 +348,7 @@ export const dictionary: any = {
         },
         deposit: {
           overview: "{{BEST DEPOSIT RATE NAME}} 看起来不错",
-          detail: "<b class='bold'>{{BEST DEPOSIT RATE ABBREV}}</b> 现在有市场上最高的 <b class='bold'> (Annual Percentage Yield)</b>。您的帐号健康度不错 我建议您多存一点您的 <b class='bold'>{{USER BALANCE}} {{BEST DEPOSIT RATE ABBREV}}</b>。",
+          detail: "<b class='bold'>{{BEST DEPOSIT RATE ABBREV}}</b> 现在有市场上最高的 <b class='bold'>借贷率</b>。您的帐号健康度不错 我建议您多存一点您的 <b class='bold'>{{USER BALANCE}} {{BEST DEPOSIT RATE ABBREV}}</b>。",
           actionText: "再存抵押物"
         },
         healthy: {
@@ -360,7 +360,9 @@ export const dictionary: any = {
         failed: "失败了!",
         success: "成功了!",
         airdropSuccess: "我们已经寄给您 {{AMOUNT}} {{RESERVE ABBREV}}。请更新您到网页。",
-        refresh: "更新网页"
+        refresh: "更新网页",
+        originationFee: "这笔贷款会收取 {{ORIGINATION FEE}}% 发起费用.",
+        headsup: "小心!"
       }
     }
   },
@@ -427,7 +429,7 @@ export const dictionary: any = {
       noDepositsForBorrow: "Вы должны предоставить залог, чтобы вы могли занять.",
       noDepositsForWithdraw: "Вы не внесли на депозит {{ASSET}} чтобы вывести",
       noDebtForRepay: "Вы не дожны {{ASSET}}.",
-      rejectTrade: "Сделка понизит ваш коэфициент залог {{NEW-C-RATIO}}%, что будет ниже минимального уровня {{JET MIN C-RATIO}}".
+      rejectTrade: "Сделка понизит ваш коэфициент залог {{NEW-C-RATIO}}%, что будет ниже минимального уровня {{JET MIN C-RATIO}}",
     },
     settings: {
       title: "Настройки",
@@ -683,27 +685,27 @@ export const definitions: any = {
     },
     collateralizationRatio: {
       term: "质押率",
-      definition: "您的抵押品价值除以您的债务价值。 您必须要过度抵押您的借贷款。 您存在Jet的资产市场价值必须要比您的借贷款还高"
+      definition: "您的抵押品价值除以您的债务价值。 您必须要超额抵押您的借贷款。 您存在Jet的资产市场价值必须要比您的借贷款还高。因为Jet可能会扣押这些抵押品，以便在贷款违约的情况下收回贷款价值。 另请参阅最大 LTV。"
     },
     adjustedCollateralizationRatio: {
       term: "调整后的质押率",
       definition: "如果這筆交易成功後的实时质押率"
     },
     depositRate: {
-      term: "存款 APY",
-      definition: "假设您全年不添加或提取资金，您在存款账户中赚取的利息总额年化百分比收益率 (APY) 包括您的利率和复利频率，即您从本金中加上您的收入利息赚取的利息"
+      term: "存款率",
+      definition: "存款人赚取的即时利率。 该费率以年化形式表示，不反映复利的影响，并且包括可能存在的任何协议费用。 费率变化会随着存入资产利用率而变化。"
     },
     borrowRate: {
-      term: "借贷 APR",
-      definition: "一年上的贷款收取的年化百分比率 (APR)。 这考虑了贷款期间复利的影响，它反映了先前累积利息也赚取的利息"
+      term: "借贷率",
+      definition: "借款人支付的即时利率。 该费率以年化形式表示，不反映复利的影响，并且包括可能存在的任何协议费用。 利率变化会随着借入资产利用率而变化。"
     },
     maximumLtv: {
       term: "最高LTV",
-      definition: "贷款价值比（loan to value,简写LTV）是指贷款金额和抵押品价值的比例。 是Jet使用的一种风险度量来决定批准的贷款规模。 您可以去查看质押率"
+      definition: "贷款价值比（loan to value,简写LTV）是指贷款金额和抵押品价值的比例。 是Jet使用的一种风险度量来决定批准的贷款规模。 您的 LTV 代表您贷款的规模与为贷款提供担保的财产价值之间的关系。 您可以去查看质押率。"
     },
     utilisationRate: {
       term: "使用率",
-      definition: "该流动性对在 Jet 计划中实际使用的潜在产出量。这是总借入价值与准备金规模的函数"
+      definition: "已借用储备资产的比例。 例如，如果 USDC 的储备资产价值 100,000 美元，借款人以借用 65,000 美元，则利用率为 65%。 剩下的 35,000 美元可用于进一步借款。"
     },
     availLiquidity: {
       term: "可用流动性",
@@ -711,8 +713,8 @@ export const definitions: any = {
     },
     liquidationPremium: {
       term: "清算溢价",
-      definition: "应用于用户抵押品清算价值的用户抵押品赤字增加的百分比 (%)"
-    },
+      definition: "清算溢价是向清算人提供额外的抵押物，清算人偿还低于最低抵押率的账户债务。此额外抵押物的美元价值等于清算溢价乘以已偿还债务的美元价值。 额外的抵押物从被清算用户的账户中支付。"
+    }
   },
   ru: {
     collateral: {
