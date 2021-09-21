@@ -53,7 +53,7 @@ export const generateCopilotSuggestion = (): void => {
           .replaceAll('{{BEST DEPOSIT RATE NAME}}', bestReserveDepositRate.name),
         detail: dictionary[preferredLanguage].copilot.suggestions.deposit.detail
           .replaceAll('{{BEST DEPOSIT RATE ABBREV}}', bestReserveDepositRate.abbrev)
-          .replaceAll('{{DEPOSIT Rate}}', bestReserveDepositRate.depositRate)
+          .replaceAll('{{DEPOSIT RATE}}', bestReserveDepositRate.depositRate)
           .replaceAll('{{USER BALANCE}}', currencyFormatter(assets.tokens[bestReserveDepositRate.abbrev].walletTokenBalance.uiAmountFloat, false, 2))
       }
     });
