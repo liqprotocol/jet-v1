@@ -73,7 +73,7 @@
           />
           {#if expanded}
             <div class="flex align-start justify-start column">
-              <span class="text-gradient">
+              <span class="bicyclette text-gradient">
                 {dictionary[$PREFERRED_LANGUAGE].copilot.name.toUpperCase()}
               </span>
             </div>
@@ -241,7 +241,7 @@
     cursor: pointer;
   }
   span {
-    font-weight: 500;
+    font-weight: bold;
     font-size: 10px;
   }
 
