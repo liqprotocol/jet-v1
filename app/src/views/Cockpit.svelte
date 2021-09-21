@@ -511,7 +511,7 @@
         <th data-key="availableLiquidity">
           {dictionary[$PREFERRED_LANGUAGE].cockpit.availableLiquidity}
         </th>
-        <th data-key="depositAPY">
+        <th data-key="depositRate">
           {dictionary[$PREFERRED_LANGUAGE].cockpit.depositRate}
           <i class="info far fa-question-circle"
               on:click={() => COPILOT.set({
@@ -519,7 +519,7 @@
               })}>
           </i>
         </th>
-        <th data-key="borrowAPR" class="datatable-border-right">
+        <th data-key="borrowRate" class="datatable-border-right">
           {dictionary[$PREFERRED_LANGUAGE].cockpit.borrowRate}
           <i class="info far fa-question-circle"
               on:click={() => COPILOT.set({
@@ -572,11 +572,11 @@
               )}
             </td>
             <td on:click={() => changeReserve($rows[i])}>
-              {$rows[i].depositAPY ? ($rows[i].depositAPY * 100).toFixed(2) : 0}%
+              {$rows[i].depositRate ? ($rows[i].depositRate * 100).toFixed(2) : 0}%
             </td>
             <td on:click={() => changeReserve($rows[i])} 
               class="datatable-border-right">
-              {$rows[i].borrowAPR ? ($rows[i].borrowAPR * 100).toFixed(2) : 0}%
+              {$rows[i].borrowRate ? ($rows[i].borrowRate * 100).toFixed(2) : 0}%
             </td>
             <td class:dt-balance={walletBalances[$rows[i].abbrev]?.uiAmountFloat} 
               on:click={() => changeReserve($rows[i])}>
