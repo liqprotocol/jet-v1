@@ -329,7 +329,7 @@ export const dictionary: any = {
         unhealthy: {
           overview: "您的帐号健康度不良",
           detail: "您的质押率 {{C-RATIO}}% 比 Jet 要求的质押率还低 {{RATIO BELOW AMOUNT}}%。Jet 要求的最低质押率是 {{JET MIN C-RATIO}}%",
-          solution: "为了更正您的仓位，您可以存入更多的抵押品，但我建议您在 \"驾驶舱\" 中偿还您的债务。,
+          solution: "为了更正您的仓位，您可以存入更多的抵押品，但我建议您在 '驾驶舱' 中偿还您的债务。",
           actionText: "去驾驶舱"
         },
         warning: {
