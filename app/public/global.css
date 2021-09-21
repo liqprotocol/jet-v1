@@ -488,7 +488,7 @@ input[type=number] {
 }
 .datatable .dt-asset span:last-of-type {
   opacity: var(--disabled-opacity) !important;
-  font-size: 9px !important;
+  font-size: 10px !important;
   top: 32px !important;
 }
 .datatable-spacer td {
