@@ -737,7 +737,7 @@
             {dictionary[$PREFERRED_LANGUAGE].cockpit.max.toUpperCase()}
           </span>
         </div>
-        <div class="trade-input flex align-center justify-center"
+        <div class="submit-input flex align-center justify-center"
           class:active={inputAmount} class:disabled={disabledInput}>
           <input on:keyup={() => adjustCollateralizationRatio()}
             on:keypress={(e) => {
@@ -766,7 +766,7 @@
             </span>
           </div>
         </div>
-        <div class="trade-input-btn flex align-center justify-center"
+        <div class="submit-input-btn flex align-center justify-center"
           class:active={sendingTrade}
           class:disabled={disabledInput}
           on:click={() => checkSubmit()}>

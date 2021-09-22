@@ -172,12 +172,17 @@ export const dictionary: any = {
     settings: {
       title: "Settings",
       wallet: "Wallet",
+      rpcNode: "RPC Node",
+      current: "Current",
+      defaultNode: "Jet Default",
+      reset: "Reset",
       connect: "Connect",
       worldOfDefi: "Connect your wallet to the world of DeFi.",
       theme: "Theme",
       light: "Light",
       dark: "Dark",
-      language: "Language"
+      language: "Language",
+      noUrl: "Enter a URL"
     },
     reserveDetail: {
       reserveSize: "Reserve Size",
@@ -303,12 +308,17 @@ export const dictionary: any = {
     settings: {
       title: "设定",
       wallet: "钱包",
+      rpcNode: "RPC Node",
+      current: "Current",
+      defaultNode: "Jet Default",
+      reset: "Reset",
       connect: "连结",
       worldOfDefi: "连结到 DeFi 世界",
       theme: "模式",
       light: "明亮",
       dark: "黑暗",
-      language: "语言"
+      language: "语言",
+      noUrl: "Enter a URL"
     },
     reserveDetail: {
       reserveSize: "储备规模",
@@ -434,12 +444,17 @@ export const dictionary: any = {
     settings: {
       title: "Настройки",
       wallet: "Кошелёк",
+      rpcNode: "RPC Node",
+      current: "Current",
+      defaultNode: "Jet Default",
+      reset: "Reset",
       connect: "Подключиться",
       worldOfDefi: "Подключить ваш кошелек к миру DeFi.",
       theme: "Тема",
       light: "Светлая",
       dark: "Тёмная",
-      language: "Язык"
+      language: "Язык",
+      noUrl: "Enter a URL"
     },
     reserveDetail: {
       reserveSize: "Размер резерва",
@@ -565,12 +580,17 @@ export const dictionary: any = {
     settings: {
       title: "Ayarlar",
       wallet: "Cüzdan",
+      rpcNode: "RPC Node",
+      current: "Current",
+      defaultNode: "Jet Default",
+      reset: "Reset",
       connect: "Bağlan",
       worldOfDefi: "Cüzdanınızı DeFi dünyasına bağlayın.",
       theme: "Tema",
       light: "Aydınlık",
       dark: "Karanlık",
-      language: "Dil"
+      language: "Dil",
+      noUrl: "Enter a URL"
     },
     reserveDetail: {
       reserveSize: "Rezerv Büyüklüğü",
@@ -642,7 +662,7 @@ export const definitions: any = {
       definition: "The value of the loan that is owed or due to the Protocol."
     },
     collateralizationRatio: {
-      term: "Collateralization Ratio Or C-Ratio",
+      term: "Collateralization Ratio",
       definition: "The value of your collateral divided by the value of your debt. You are required to over-collateralize your loan, i.e. the fair market value of your deposited assets must exceed the value of the amount you are allowed to borrow. This provides for a reduction because the Protocol may seize this collateral in order to recoup the value of the loan in the event of default on a loan. See also, Maximum LTV."
     },
     adjustedCollateralizationRatio: {

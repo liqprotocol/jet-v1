@@ -6,7 +6,7 @@ import { AccountLayout as TokenAccountLayout, Token, TOKEN_PROGRAM_ID, u64 } fro
 import Rollbar from 'rollbar';
 import WalletAdapter from './walletAdapter';
 import type { Reserve, AssetStore, SolWindow, WalletProvider, Wallet, Asset, Market, Reserves, MathWallet, SolongWallet } from '../models/JetTypes';
-import { MARKET, WALLET, ASSETS, PROGRAM, CURRENT_RESERVE } from '../store';
+import { MARKET, WALLET, ASSETS, PROGRAM, CURRENT_RESERVE, PREFERRED_NODE } from '../store';
 import { subscribeToAssets, subscribeToMarket } from './subscribe';
 import { findDepositNoteAddress, findDepositNoteDestAddress, findLoanNoteAddress, findObligationAddress, sendTransaction, transactionErrorToString, findCollateralAddress, SOL_DECIMALS, parseIdlMetadata, sendAllTransactions, InstructionAndSigner, explorerUrl } from './programUtil';
 import { Amount, TokenAmount } from './utils';
@@ -44,7 +44,6 @@ export const rollbar = new Rollbar({
   }
 });
 
-
 // Cast solana injected window type
 const solWindow = window as unknown as SolWindow;
 
@@ -60,7 +59,17 @@ export const getMarketAndIDL = async (): Promise<void> => {
   const idlMetadata = parseIdlMetadata(idl.metadata);
 
   // Establish web3 connection
-  connection = new anchor.web3.Connection(idlMetadata.cluster, (anchor.Provider.defaultOptions()).commitment);
+  const preferredNode = localStorage.getItem('jetPreferredNode');
+  PREFERRED_NODE.set(preferredNode);
+  try {
+    connection = new anchor.web3.Connection(
+      preferredNode ?? idlMetadata.cluster, 
+      (anchor.Provider.defaultOptions()).commitment
+    );
+  } catch {
+    localStorage.removeItem('jetPreferredNode');
+    connection = new anchor.web3.Connection(idlMetadata.cluster, (anchor.Provider.defaultOptions()).commitment);
+  }
   coder = new anchor.Coder(idl);
 
   // Setup reserve structures
