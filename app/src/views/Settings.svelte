@@ -38,11 +38,6 @@
   <div class="setting flex align-start justify-center column">
     <span>
       {dictionary[$PREFERRED_LANGUAGE].settings.rpcNode}
-      {#if $PING}
-        <div class="ping-indicator"
-          style={$PING < 1000 ? 'background: var(--success);' : 'background: var(--failure);'}>
-        </div>
-      {/if}
     </span>
     <div class="flex align-center justify-start"
       style="padding: var(--spacing-xs) 0;">
@@ -53,9 +48,12 @@
       </div>
       <div class="flex align-center justify-start">
         <p style="font-weight: bold;">
-          {$PREFERRED_NODE ?? dictionary[$PREFERRED_LANGUAGE].settings.defaultNode}&nbsp;
+          {$PREFERRED_NODE ?? dictionary[$PREFERRED_LANGUAGE].settings.defaultNode}
         </p>
         {#if $PING}
+          <div class="ping-indicator"
+            style={$PING < 1000 ? 'background: var(--success);' : 'background: var(--failure);'}>
+          </div>
           <p style={$PING < 1000 ? 'color: var(--success);' : 'color: var(--failure);'}>
             ({$PING}ms)
           </p>
@@ -224,12 +222,10 @@
     font-size: 16px;
   }
   .ping-indicator {
-    width: 5px;
-    height: 5px;
+    width: 8px;
+    height: 8px;
     border-radius: 50px;
-    position: absolute;
-    top: 10px;
-    right: -7px;
+    margin: 0 var(--spacing-xs);
     opacity: var(--disabled-opacity);
   }
   input {
