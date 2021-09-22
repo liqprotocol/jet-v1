@@ -16,7 +16,11 @@
 :root {
   --black: #444444;
   --grey: #d8dfec;
+<<<<<<< HEAD
 	--white: #e6edf7; /* e4ebf5 */
+=======
+	--white: #e4ebf5;
+>>>>>>> 955055e057f8a049094d8ff55ea853022b5cfb61
 	--jet-green: #44a88c; /* 53bd9f */
 	--jet-blue: #2a97c2; /* 32a5d3 */
   --success: #44a88c; /* 53bd9f */
