@@ -5,8 +5,8 @@ import { ASSOCIATED_TOKEN_PROGRAM_ID, NATIVE_MINT } from "@solana/spl-token";
 import { AccountLayout as TokenAccountLayout, Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
 import Rollbar from 'rollbar';
 import WalletAdapter from './walletAdapter';
-import type { Reserve, AssetStore, SolWindow, WalletProvider, Wallet, Asset, Market, Reserves, MathWallet, SolongWallet } from '../models/JetTypes';
-import { MARKET, WALLET, ASSETS, PROGRAM, CURRENT_RESERVE, PREFERRED_NODE } from '../store';
+import type { Reserve, AssetStore, SolWindow, WalletProvider, Wallet, Asset, Market, MathWallet, SolongWallet } from '../models/JetTypes';
+import { MARKET, WALLET, ASSETS, PROGRAM, PREFERRED_NODE } from '../store';
 import { subscribeToAssets, subscribeToMarket } from './subscribe';
 import { findDepositNoteAddress, findDepositNoteDestAddress, findLoanNoteAddress, findObligationAddress, sendTransaction, transactionErrorToString, findCollateralAddress, SOL_DECIMALS, parseIdlMetadata, sendAllTransactions, InstructionAndSigner, explorerUrl } from './programUtil';
 import { Amount, TokenAmount } from './utils';
@@ -73,7 +73,7 @@ export const getMarketAndIDL = async (): Promise<void> => {
   coder = new anchor.Coder(idl);
 
   // Setup reserve structures
-  const reserves: Reserves = {} as Reserves;
+  const reserves: Record<string, Reserve> = {};
   for (const reserveMeta of idlMetadata.reserves) {
     let reserve: Reserve = {
       name: reserveMeta.name,
@@ -115,9 +115,6 @@ export const getMarketAndIDL = async (): Promise<void> => {
     authorityPubkey: idlMetadata.market.marketAuthority,
     reserves: reserves,
   });
-
-  // Set initial current asset to SOL
-  CURRENT_RESERVE.set(reserves[0]);
 
   // Subscribe to market 
   subscribeToMarket(idlMetadata, connection, coder);

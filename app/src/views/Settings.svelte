@@ -100,9 +100,10 @@
       <span>
         {dictionary[$PREFERRED_LANGUAGE].settings.wallet}
       </span>
-      <div class="wallet flex align-center justify-center" 
+      <div class="wallet flex align-center justify-center"
         on:click={() => disconnectWallet()}>
         <img width="28px" height="auto" 
+          style="margin-right: var(--spacing-xs);"
           src={`img/wallets/${$WALLET.name.replace(' ', '_').toLowerCase()}.png`} 
           alt={`${$WALLET.name} Logo`}
         />

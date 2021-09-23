@@ -416,6 +416,11 @@
       updateTime = currentTime + 3000;
     }
 
+    // If no current reserve, set to SOL
+    if (!$CURRENT_RESERVE) {
+      CURRENT_RESERVE.set($MARKET.reserves[0])
+    }
+
     // Add search icon to table search input
     if (!document.querySelector('.dt-search i')) {
       const searchIcon = document.createElement('i');
