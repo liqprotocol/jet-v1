@@ -1,5 +1,5 @@
 import type { Locale } from '../models/JetTypes';
-import { GEOBANNED, LOCALE, PREFERRED_LANGUAGE } from '../store';
+import { LOCALE, PREFERRED_LANGUAGE, INIT_FAILED } from '../store';
 
 // Get user's preferred language from browser
 // Use fallback if not
@@ -23,13 +23,13 @@ export const getLocale = async (): Promise<void> => {
     locale = await resp.json();
     geoBannedCountries.forEach(c => {
       if (!locale?.country || c.code === locale?.country) {
-  // If country is Ukraine, checks if first two digits
-  // of the postal code further match Crimean postal codes.
+        // If country is Ukraine, checks if first two digits
+        // of the postal code further match Crimean postal codes.
         if (locale?.country === "UA") {
           const ifCrimea: string = locale?.postal.toString().substring(0, 2);
-          ifCrimea === ("95" || "96" || "97" || "98") ? GEOBANNED.set(true) : null
+          ifCrimea === ("95" || "96" || "97" || "98") ? INIT_FAILED.set({ geobanned: true }) : null
         } else {
-          GEOBANNED.set(true);
+          INIT_FAILED.set({ geobanned: true });
         }
       }
     });

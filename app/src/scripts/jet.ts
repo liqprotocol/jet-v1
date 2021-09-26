@@ -6,7 +6,7 @@ import { AccountLayout as TokenAccountLayout, Token, TOKEN_PROGRAM_ID, u64 } fro
 import Rollbar from 'rollbar';
 import WalletAdapter from './walletAdapter';
 import type { Reserve, AssetStore, SolWindow, WalletProvider, Wallet, Asset, Market, MathWallet, SolongWallet } from '../models/JetTypes';
-import { MARKET, WALLET, ASSETS, PROGRAM, PREFERRED_NODE, WALLET_INIT } from '../store';
+import { MARKET, WALLET, ASSETS, PROGRAM, PREFERRED_NODE, WALLET_INIT, CURRENT_RESERVE, INIT_FAILED } from '../store';
 import { subscribeToAssets, subscribeToMarket } from './subscribe';
 import { findDepositNoteAddress, findDepositNoteDestAddress, findLoanNoteAddress, findObligationAddress, sendTransaction, transactionErrorToString, findCollateralAddress, SOL_DECIMALS, parseIdlMetadata, sendAllTransactions, InstructionAndSigner, explorerUrl } from './programUtil';
 import { Amount, TokenAmount } from './utils';
@@ -53,24 +53,30 @@ let coder: anchor.Coder;
 
 // Get IDL and market data
 export const getMarketAndIDL = async (): Promise<void> => {
-  // Fetch IDL
+  // Fetch IDL and preferred RPC Node
   const resp = await fetch('idl/jet.json');
   idl = await resp.json();
   const idlMetadata = parseIdlMetadata(idl.metadata);
-
-  // Establish web3 connection
   const preferredNode = localStorage.getItem('jetPreferredNode');
   PREFERRED_NODE.set(preferredNode);
+  coder = new anchor.Coder(idl);
+
+  // Establish and test web3 connection
+  // If error log it and display failure component
   try {
     connection = new anchor.web3.Connection(
       preferredNode ?? idlMetadata.cluster, 
       (anchor.Provider.defaultOptions()).commitment
     );
-  } catch {
-    localStorage.removeItem('jetPreferredNode');
-    connection = new anchor.web3.Connection(idlMetadata.cluster, (anchor.Provider.defaultOptions()).commitment);
+
+    await connection.getVersion();
+    INIT_FAILED.set(null);
+  } catch (err) {
+    console.error(`Unable to connect: ${err}`)
+    rollbar.critical(`Unable to connect: ${err}`);
+    INIT_FAILED.set({ geobanned: false });
+    return;
   }
-  coder = new anchor.Coder(idl);
 
   // Setup reserve structures
   const reserves: Record<string, Reserve> = {};
@@ -116,6 +122,9 @@ export const getMarketAndIDL = async (): Promise<void> => {
     reserves: reserves,
   });
 
+  // Set current reserve to SOL
+  CURRENT_RESERVE.set(market.reserves.SOL);
+
   // Subscribe to market 
   await subscribeToMarket(idlMetadata, connection, coder);
 };
@@ -158,6 +167,7 @@ export const getWalletAndAnchor = async (provider: WalletProvider): Promise<void
     await getAssetPubkeys();
     await subscribeToAssets(connection, coder, wallet.publicKey);
     WALLET_INIT.set(true);
+    //const tx = await connection.getConfirmedSignaturesForAddress2(new anchor.web3.PublicKey(wallet.publicKey));
   });
   await wallet.connect();
   return;

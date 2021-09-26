@@ -9,7 +9,7 @@
   import NavLink from './NavLink.svelte';
   import Toggle from './Toggle.svelte';
 
-  export let init: boolean;
+  export let launchUI: boolean;
 
   let expanded: boolean = false;
   const location = useLocation();
@@ -37,7 +37,7 @@
 <!--Desktop-->
 <nav class="desktop flex flex align-center justify-between column" 
   class:expanded
-  style={init ? 'opacity: 1;' : 'opacity: 0;'}>
+  style={launchUI ? 'opacity: 1;' : 'opacity: 0;'}>
 	<div class="top flex align-center column">
     <div class="nav-logo-container flex align-center justify-center">
       <Logo width={!expanded ? 50 : 100} logoMark={!expanded} />
@@ -115,7 +115,7 @@
 </nav>
 <!--Tablet-->
 <nav class="tablet flex flex align-center justify-between" 
-  style={init ? 'opacity: 1;' : 'opacity: 0;'}>
+  style={launchUI ? 'opacity: 1;' : 'opacity: 0;'}>
 	<div class="top flex align-center justify-evenly">
     <NavLink active={$location.pathname === '/'} 
       path="/" icon={$location.pathname === '/' ? '✔' : '✈'} 
@@ -158,7 +158,7 @@
 </nav>
 <!--Mobile-->
 <nav class="mobile flex flex align-center justify-between" 
-  style={init ? 'opacity: 1;' : 'opacity: 0;'}>
+  style={launchUI ? 'opacity: 1;' : 'opacity: 0;'}>
 	<div class="top flex align-center justify-evenly">
     <NavLink active={$location.pathname === '/'} 
       path="/" icon={$location.pathname === '/' ? '✔' : '✈'} 

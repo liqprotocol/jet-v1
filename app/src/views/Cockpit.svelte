@@ -5,7 +5,7 @@
   import { Datatable, rows } from 'svelte-simple-datatables';
   import { NATIVE_MINT } from '@solana/spl-token';
   import type { Reserve, Obligation } from '../models/JetTypes';
-  import { TRADE_ACTION, MARKET, ASSETS, CURRENT_RESERVE, NATIVE, COPILOT, PREFERRED_LANGUAGE, WALLET_INIT, WALLET } from '../store';
+  import { TRADE_ACTION, MARKET, ASSETS, CURRENT_RESERVE, NATIVE, COPILOT, PREFERRED_LANGUAGE, WALLET_INIT, INIT_FAILED } from '../store';
   import { inDevelopment, airdrop, deposit, withdraw, borrow, repay } from '../scripts/jet';
   import { currencyFormatter, totalAbbrev, getObligationData, TokenAmount, Amount } from '../scripts/utils';
   import { dictionary, definitions } from '../scripts/localization'; 
@@ -14,6 +14,7 @@
   import ConnectWallet from '../components/ConnectWallet.svelte';
   import ReserveDetail from '../components/ReserveDetail.svelte';
   import Toggle from '../components/Toggle.svelte';
+  import InitFailed from '../components/InitFailed.svelte';
 
   let marketTVL: number = 0;
   let walletBalances: Record<string, TokenAmount> = {};
@@ -229,7 +230,7 @@
     };
 
     // Set adjusted ratio to current ratio
-    if (!adjustedRatio && obligation.colRatio) {
+    if (!adjustedRatio && obligation?.colRatio) {
       adjustedRatio = obligation.colRatio;
     }
 
@@ -419,11 +420,6 @@
       updateTime = currentTime + 3000;
     }
 
-    // If no current reserve, set to SOL
-    if (!$CURRENT_RESERVE) {
-      CURRENT_RESERVE.set($MARKET.reserves[0])
-    }
-
     // Add search icon to table search input
     if (!document.querySelector('.dt-search i')) {
       const searchIcon = document.createElement('i');
@@ -439,7 +435,7 @@
   }
 </script>
 
-{#if $MARKET && $CURRENT_RESERVE}
+{#if $MARKET && $CURRENT_RESERVE && !$INIT_FAILED}
   <div class="view-container flex justify-center column">
     <h1 class="view-title text-gradient">
       {dictionary[$PREFERRED_LANGUAGE].cockpit.title}
@@ -469,9 +465,9 @@
           </div>
           <h1 class="view-header"
             style={`margin-bottom: -20px; 
-            ${obligation?.borrowedValue && (obligation?.colRatio <= $MARKET.minColRatio) 
+            ${$WALLET_INIT ? (obligation?.borrowedValue && (obligation?.colRatio <= $MARKET.minColRatio) 
               ? 'color: var(--failure);' 
-                : 'color: var(--success);'}`}>
+                : 'color: var(--success);') : ''}`}>
             {#if $WALLET_INIT}
               {#if obligation?.borrowedValue && obligation?.colRatio > 10}
                 &gt;1000
@@ -495,7 +491,7 @@
             <h2 class="view-subheader">
               {dictionary[$PREFERRED_LANGUAGE].cockpit.totalDepositedValue}
             </h2>
-            <p class="text-gradient bicyclette">
+            <p class={`${$WALLET_INIT ? 'text-gradient' : ''} bicyclette`}>
               {$WALLET_INIT ? totalAbbrev(obligation?.depositedValue ?? 0) : '--'}
             </p>
           </div>
@@ -503,7 +499,7 @@
             <h2 class="view-subheader">
               {dictionary[$PREFERRED_LANGUAGE].cockpit.totalBorrowedValue}
             </h2>
-            <p class="text-gradient bicyclette">
+            <p class={`${$WALLET_INIT ? 'text-gradient' : ''} bicyclette`}>
               {$WALLET_INIT ? totalAbbrev(obligation?.borrowedValue ?? 0) : '--'}
             </p>
           </div>
@@ -830,8 +826,10 @@
         reserveDetail = null;
       }} />
   {/if}
+{:else if $INIT_FAILED}
+  <InitFailed />
 {:else}
- <Loader fullview text={dictionary[$PREFERRED_LANGUAGE].loading.fetchingAccount} />
+  <Loader fullview />
 {/if}
 
 <style>
