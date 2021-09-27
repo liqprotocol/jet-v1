@@ -132,9 +132,9 @@ export const getMarketAndIDL = async (): Promise<void> => {
 // Connect to user's wallet
 export const getWalletAndAnchor = async (provider: WalletProvider): Promise<void> => {
   // Wallet adapter or injected wallet setup
-  if (provider.name === 'Phantom' && solWindow.solana.isPhantom) {
+  if (provider.name === 'Phantom' && solWindow.solana?.isPhantom) {
     wallet = solWindow.solana as unknown as Wallet;
-  } else if (provider.name === 'Math Wallet' && solWindow.solana.isMathWallet) {
+  } else if (provider.name === 'Math Wallet' && solWindow.solana?.isMathWallet) {
     wallet = solWindow.solana as unknown as MathWallet;
     wallet.publicKey = new anchor.web3.PublicKey(await solWindow.solana.getAccount());
     wallet.on = (action: string, callback: Function) => callback();
@@ -167,7 +167,6 @@ export const getWalletAndAnchor = async (provider: WalletProvider): Promise<void
     await getAssetPubkeys();
     await subscribeToAssets(connection, coder, wallet.publicKey);
     WALLET_INIT.set(true);
-    //const tx = await connection.getConfirmedSignaturesForAddress2(new anchor.web3.PublicKey(wallet.publicKey));
   });
   await wallet.connect();
   return;
