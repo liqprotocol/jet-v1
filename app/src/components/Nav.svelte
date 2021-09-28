@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { useLocation } from 'svelte-navigator';
   import { WALLET, ASSETS, DARK_THEME, PREFERRED_LANGUAGE } from '../store';
-  import { disconnectWallet, setDark } from '../scripts/utils';
+  import { disconnectWallet, setDark, shortenPubkey } from '../scripts/utils';
   import { dictionary } from '../scripts/localization';
   import { generateCopilotSuggestion } from '../scripts/copilot';
   import Logo from './Logo.svelte';
@@ -93,9 +93,7 @@
           />
           {#if expanded}
             <span class="text-gradient">
-              {$WALLET.publicKey.toString().substring(0, 4)}...{$WALLET.publicKey.toString().substring(
-                $WALLET.publicKey.toString().length - 4
-              )}
+              {shortenPubkey($WALLET.publicKey.toString(), 4)}
             </span>
           {/if}
         </div>
@@ -155,10 +153,7 @@
           alt={`${$WALLET.name} Logo`}
         />
         <span class="text-gradient">
-          {$WALLET.publicKey.toString().substring(0, 4)}...
-          {$WALLET.publicKey.toString().substring(
-            $WALLET.publicKey.toString().length - 4
-          )}
+          {shortenPubkey($WALLET.publicKey.toString(), 4)}
         </span>
       </div>
     {/if}

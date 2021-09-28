@@ -52,7 +52,7 @@ let connection: anchor.web3.Connection;
 let coder: anchor.Coder;
 
 // Record of instructions to their first 8 bytes for transaction logs
-const instructionBytes: Record<string, number[]> = {
+const INSTRUCTION_BYTES: Record<string, number[]> = {
   'Deposit': [242, 35, 198, 137, 82, 225, 242, 182],
   'Withdraw': [183, 18, 70, 156, 148, 109, 161, 34],
   'Borrow': [228, 253, 131, 202, 207, 116, 89, 18],
@@ -194,7 +194,7 @@ export const getTransactionLogs = async (): Promise<void> => {
     // Use log messages to only surface transactions that utilize Jet
     for (let msg of log.meta.logMessages) {
       if (msg.indexOf(idl.metadata.address) !== -1) {
-        for (let progInst in instructionBytes) {
+        for (let progInst in INSTRUCTION_BYTES) {
           for (let inst of log.transaction.instructions) {
             // Get first 8 bytes from data
             const txInstBytes = [];
@@ -202,7 +202,7 @@ export const getTransactionLogs = async (): Promise<void> => {
               txInstBytes.push(inst.data[i]);
             }
             // If those bytes match any of our instructions label trade action
-            if (JSON.stringify(instructionBytes[progInst]) === JSON.stringify(txInstBytes)) {
+            if (JSON.stringify(INSTRUCTION_BYTES[progInst]) === JSON.stringify(txInstBytes)) {
               log.tradeAction = progInst;
               // Determine asset and trade amount
               for (let pre of log.meta.preTokenBalances as any[]) {

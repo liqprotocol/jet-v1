@@ -3,9 +3,9 @@
 </svelte:head>
 <script lang="ts">
   import { Datatable, rows } from 'svelte-simple-datatables';
-  import { ASSETS, TRANSACTION_LOGS, PREFERRED_LANGUAGE, WALLET_INIT, NATIVE } from '../store';
+  import { ASSETS, TRANSACTION_LOGS, PREFERRED_LANGUAGE, WALLET_INIT } from '../store';
   import { getTransactionLogs } from '../scripts/jet'; 
-  import { totalAbbrev } from '../scripts/utils';
+  import { totalAbbrev, shortenPubkey } from '../scripts/utils';
   import { dictionary, definitions } from '../scripts/localization'; 
   import ConnectWallet from '../components/ConnectWallet.svelte';
   import Toggle from '../components/Toggle.svelte';
@@ -22,13 +22,13 @@
   };
 
   // Reactive statement to update data
-  // on any account change every 3 seconds
+  // on any account change every 10 seconds
   let updateTime: number = 0;
   $: if ($ASSETS || $TRANSACTION_LOGS) {
     const currentTime = performance.now();
     if (currentTime > updateTime) {
       getTransactionLogs();
-      updateTime = currentTime + 3000;
+      updateTime = currentTime + 10000;
     }
   }
 </script>
@@ -72,10 +72,7 @@
                 {$rows[i].blockDate}
               </td>
               <td style="color: var(--success);">
-                {$rows[i].signature.substring(0, 8)}...
-                {$rows[i].signature.substring(
-                  $rows[i].signature.length - 8
-                )}
+                {shortenPubkey($rows[i].signature, 8)}
               </td>
               <td class="reserve-detail"
                 style="text-align: center !important;">
