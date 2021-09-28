@@ -326,7 +326,6 @@
       inputError = '';
       const depositLamports = TokenAmount.tokens(tradeAmountString, $CURRENT_RESERVE.decimals).amount;
       [ok, txid] = await deposit($CURRENT_RESERVE.abbrev, depositLamports);
-      console.log([ok, txid]);
     } else if ($TRADE_ACTION === 'withdraw') {
       if (TokenAmount.tokens(tradeAmountString, $CURRENT_RESERVE.decimals).amount.gt($CURRENT_RESERVE.availableLiquidity.amount)) {
         inputAmount = null;
