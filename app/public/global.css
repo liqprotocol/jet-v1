@@ -17,8 +17,8 @@
   --black: #444444;
   --grey: #d8dfec;
 	--white: #e6edf7; /* e4ebf5 */
-	--jet-green: #44a88c; /* 53bd9f */
-	--jet-blue: #2a97c2; /* 32a5d3 */
+	--jet-green: #40a387; /* 53bd9f */
+	--jet-blue: #2994be; /* 32a5d3 */
   --success: #44a88c; /* 53bd9f */
   --failure: #ec6a69;
 
@@ -519,6 +519,9 @@ input[type=number] {
   background-image: var(--gradient) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
+}
+.datatable .dt-bold {
+  font-weight: 500 !important;
 }
 
 /* Tablet/Mobile styling */

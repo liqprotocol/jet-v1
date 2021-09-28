@@ -1,11 +1,12 @@
 import type * as anchor from '@project-serum/anchor';
-import type { Market, Reserve, AssetStore, Copilot, Locale } from './models/JetTypes';
+import type { Market, Reserve, AssetStore, Copilot, Locale, TransactionLog } from './models/JetTypes';
 import { writable } from 'svelte/store';
 
 // Writable value stores
 export const MARKET = writable<Market>({reserves: {}} as Market);
 export const WALLET = writable<any> (null);
 export const ASSETS = writable<AssetStore | null> (null);
+export const TRANSACTION_LOGS = writable<TransactionLog[] | null> (null);
 export const CURRENT_RESERVE = writable<Reserve | null> (null);
 export const TRADE_ACTION = writable<string> ('deposit');
 export const COPILOT = writable<Copilot | null> (null);

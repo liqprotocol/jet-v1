@@ -306,13 +306,15 @@ export interface TransactionLog {
   },
   slot: number,
   tradeAction: string,
+  tradeAmount: TokenAmount,
   transaction: {
     feePayer: PublicKey,
     instructions: TransactionInstruction[],
     nonceInfo: any,
     recentBlockhash: string,
     signatures: string[]
-  }
+  },
+  tokenAbbrev: string
 }
 
 // Web3

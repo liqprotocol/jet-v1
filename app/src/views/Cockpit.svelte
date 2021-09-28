@@ -594,42 +594,54 @@
               class="datatable-border-right">
               {$rows[i].borrowRate ? ($rows[i].borrowRate * 100).toFixed(2) : 0}%
             </td>
-            <td class:dt-balance={walletBalances[$rows[i].abbrev]?.uiAmountFloat} 
+            <td class:dt-bold={walletBalances[$rows[i].abbrev]?.uiAmountFloat} 
+              class:dt-balance={walletBalances[$rows[i].abbrev]?.uiAmountFloat} 
               on:click={() => changeReserve($rows[i])}>
               {#if $WALLET_INIT}
+                {#if walletBalances[$rows[i].abbrev]?.uiAmountFloat && walletBalances[$rows[i].abbrev]?.uiAmountFloat < 0.005}
+                  ~
+                {/if}
                 {totalAbbrev(
                   walletBalances[$rows[i].abbrev]?.uiAmountFloat ?? 0,
                   $rows[i].price,
                   $NATIVE,
-                  $rows[i].decimals
+                  3
                 )}
               {:else}
                   --
               {/if}
             </td>
-            <td on:click={() => changeReserve($rows[i])}
+            <td class:dt-bold={collateralBalances[$rows[i].abbrev]} 
+              on:click={() => changeReserve($rows[i])}
               style={collateralBalances[$rows[i].abbrev] ? 
                 'color: var(--jet-green) !important;' : ''}>
               {#if $WALLET_INIT}
+                {#if collateralBalances[$rows[i].abbrev] && collateralBalances[$rows[i].abbrev] < 0.005}
+                  ~
+                {/if}
                 {totalAbbrev(
                   collateralBalances[$rows[i].abbrev],
                   $rows[i].price,
                   $NATIVE,
-                  $rows[i].decimals
+                  3
                 )}
               {:else}
                   --
               {/if}
             </td>
-            <td on:click={() => changeReserve($rows[i])}
-             style={loanBalances[$rows[i].abbrev] ? 
+            <td class:dt-bold={loanBalances[$rows[i].abbrev]} 
+              on:click={() => changeReserve($rows[i])}
+              style={loanBalances[$rows[i].abbrev] ? 
               'color: var(--jet-blue) !important;' : ''}>
               {#if $WALLET_INIT}
+                {#if loanBalances[$rows[i].abbrev] && loanBalances[$rows[i].abbrev] < 0.005}
+                  ~
+                {/if}
                 {totalAbbrev(
                   loanBalances[$rows[i].abbrev],
                   $rows[i].price,
                   $NATIVE,
-                  $rows[i].decimals
+                  3
                 )}
               {:else}
                 --

@@ -21,6 +21,8 @@ export const initDarkTheme = () => {
 // Toggle dark theme root CSS attributes
 export const setDark = (darkTheme: boolean): void => {
   if (darkTheme) {
+    document.documentElement.style.setProperty('--jet-green', '#53bd9f');
+    document.documentElement.style.setProperty('--jet-blue', '#32a5d3');
     document.documentElement.style.setProperty('--black', '#ffffff');
     document.documentElement.style.setProperty('--grey', '#504f4f');
     document.documentElement.style.setProperty('--white', '#444444');
