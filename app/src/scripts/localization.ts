@@ -124,7 +124,7 @@ export const dictionary: any = {
   //Turkish
   tr: Jet_UI_TR,
   //Korean
-  kr: Jet_UI_KR,
+  kr: Jet_UI_KR
 };
 
 // Definitions of various terminology
