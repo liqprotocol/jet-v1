@@ -186,7 +186,7 @@ export const getTransactionLogs = async (): Promise<void> => {
   // Establish solana connection and get all confirmed signatures
   // associated with user's wallet pubkey
   const txLogs: TransactionLog[] = [];
-  const solanaConnection = new anchor.web3.Connection('https://api.devnet.solana.com/');
+  const solanaConnection = new anchor.web3.Connection(`https://api.${inDevelopment? 'devnet' : 'mainnet-beta'}.solana.com/`);
   const sigs = await solanaConnection.getConfirmedSignaturesForAddress2(wallet.publicKey); 
   for (let sig of sigs) {
     // Get confirmed transaction from each signature
@@ -211,6 +211,8 @@ export const getTransactionLogs = async (): Promise<void> => {
                     for (let reserve of idl.metadata.reserves) {
                       if (reserve.accounts.tokenMint === pre.mint) {
                         log.tokenAbbrev = reserve.abbrev;
+                        log.tokenDecimals = reserve.decimals;
+                        log.tokenPrice = reserve.price;
                         log.tradeAmount = new TokenAmount(
                           new BN(post.uiTokenAmount.amount - pre.uiTokenAmount.amount),
                           reserve.decimals
@@ -220,8 +222,12 @@ export const getTransactionLogs = async (): Promise<void> => {
                   }
                 }
               }
+              // Signature
+              log.signature = sig.signature;
               // UI date
-              log.blockDate = new Date(log.blockTime * 1000);
+              log.blockDate = new Date(log.blockTime * 1000).toLocaleDateString();
+              // Explorer URL
+              log.explorerUrl = explorerUrl(log.signature);
               // Add tx to logs
               txLogs.push(log);
             }

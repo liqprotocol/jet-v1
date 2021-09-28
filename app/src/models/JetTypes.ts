@@ -290,7 +290,8 @@ export interface Asset {
 // Transaction Logs
 export interface TransactionLog {
   blockTime: number,
-  blockDate: Date,
+  blockDate: string,
+  explorerUrl: string,
   meta: {
     err: any,
     fee: number,
@@ -305,6 +306,7 @@ export interface TransactionLog {
     slot: number
   },
   slot: number,
+  signature: string,
   tradeAction: string,
   tradeAmount: TokenAmount,
   transaction: {
@@ -314,7 +316,9 @@ export interface TransactionLog {
     recentBlockhash: string,
     signatures: string[]
   },
-  tokenAbbrev: string
+  tokenAbbrev: string,
+  tokenDecimals: number,
+  tokenPrice: number
 }
 
 // Web3

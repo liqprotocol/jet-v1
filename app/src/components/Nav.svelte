@@ -46,6 +46,10 @@
       path="/" icon={$location.pathname === '/' ? '✔' : '✈'}
       text={expanded ? dictionary[$PREFERRED_LANGUAGE].nav.cockpit : ''} 
     />
+    <NavLink active={$location.pathname === '/transactions'} 
+      path='/transactions' icon={$location.pathname === '/transactions' ? '➺' : '➸'}
+      text={expanded ? dictionary[$PREFERRED_LANGUAGE].nav.transactions : ''} 
+    />
     <NavLink active={$location.pathname === '/settings'} 
       path='/settings' icon={$location.pathname === '/settings' ? '✎' : '✀'}
       text={expanded ? dictionary[$PREFERRED_LANGUAGE].nav.settings : ''} 
@@ -121,6 +125,10 @@
       path="/" icon={$location.pathname === '/' ? '✔' : '✈'} 
       text={dictionary[$PREFERRED_LANGUAGE].nav.cockpit} 
     />
+    <NavLink active={$location.pathname === '/transactions'} 
+      path='/transactions' icon={$location.pathname === '/transactions' ? '➺' : '➸'} 
+      text={dictionary[$PREFERRED_LANGUAGE].nav.transactions} 
+    />
     <NavLink active={$location.pathname === '/settings'} 
       path='/settings' icon={$location.pathname === '/settings' ? '✎' : '✀'} 
       text={dictionary[$PREFERRED_LANGUAGE].nav.settings} 
@@ -147,7 +155,7 @@
           alt={`${$WALLET.name} Logo`}
         />
         <span class="text-gradient">
-          {$WALLET.publicKey.toString().substring(0, 4)}..
+          {$WALLET.publicKey.toString().substring(0, 4)}...
           {$WALLET.publicKey.toString().substring(
             $WALLET.publicKey.toString().length - 4
           )}
@@ -162,6 +170,9 @@
 	<div class="top flex align-center justify-evenly">
     <NavLink active={$location.pathname === '/'} 
       path="/" icon={$location.pathname === '/' ? '✔' : '✈'} 
+    />
+    <NavLink active={$location.pathname === '/transactions'} 
+      path='/transactions' icon={$location.pathname === '/transactions' ? '➺' : '➸'} 
     />
     <NavLink active={$location.pathname === '/settings'} 
       path='/settings' icon={$location.pathname === '/settings' ? '✎' : '✀'} 
