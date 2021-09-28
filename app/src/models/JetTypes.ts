@@ -1,4 +1,4 @@
-import type { AccountInfo, PublicKey } from '@solana/web3.js';
+import type { AccountInfo, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 import type BN from 'bn.js';
 import type WalletAdapter from '../scripts/walletAdapter';
 import type { TokenAmount } from '../scripts/utils';
@@ -287,6 +287,34 @@ export interface Asset {
   collateralBalance: TokenAmount,
 };
 
+// Transaction Logs
+export interface TransactionLog {
+  blockTime: number,
+  blockDate: Date,
+  meta: {
+    err: any,
+    fee: number,
+    innerInstructions: Object[],
+    logMessages: string[],
+    postBalances: number[],
+    postTokenBalances: Object[],
+    preBalances: number[],
+    preTokenBalances: Object[],
+    rewards: any[],
+    status: Record<string, any>,
+    slot: number
+  },
+  slot: number,
+  tradeAction: string,
+  transaction: {
+    feePayer: PublicKey,
+    instructions: TransactionInstruction[],
+    nonceInfo: any,
+    recentBlockhash: string,
+    signatures: string[]
+  }
+}
+
 // Web3
 export interface HasPublicKey {
   publicKey: PublicKey;
@@ -307,7 +335,7 @@ export interface CopilotSuggestion {
   detail?: string,
   solution?: string,
   action?: {
-    text: string,
+    text?: string,
     onClick: () => void,
   }
 };

@@ -5,9 +5,10 @@
   import { Datatable, rows } from 'svelte-simple-datatables';
   import { NATIVE_MINT } from '@solana/spl-token';
   import type { Reserve, Obligation } from '../models/JetTypes';
-  import { TRADE_ACTION, MARKET, ASSETS, CURRENT_RESERVE, NATIVE, COPILOT, PREFERRED_LANGUAGE, WALLET_INIT, INIT_FAILED } from '../store';
+  import { TRADE_ACTION, MARKET, ASSETS, CURRENT_RESERVE, NATIVE, COPILOT, PREFERRED_LANGUAGE, WALLET_INIT, INIT_FAILED, LIQUIDATION_WARNED } from '../store';
   import { inDevelopment, airdrop, deposit, withdraw, borrow, repay } from '../scripts/jet';
   import { currencyFormatter, totalAbbrev, getObligationData, TokenAmount, Amount } from '../scripts/utils';
+  import { generateCopilotSuggestion } from '../scripts/copilot';
   import { dictionary, definitions } from '../scripts/localization'; 
   import { explorerUrl } from '../scripts/programUtil';
   import Loader from '../components/Loader.svelte';
@@ -432,6 +433,11 @@
       market.minColRatio = 1.3;
       return market;
     });
+
+    // If user is subject to liquidation, warn them once
+    if (!$LIQUIDATION_WARNED && obligation?.borrowedValue && obligation?.colRatio <= $MARKET.minColRatio) {
+      generateCopilotSuggestion();
+    }
   }
 </script>
 
