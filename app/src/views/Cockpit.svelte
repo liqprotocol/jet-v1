@@ -249,7 +249,7 @@
   // Check scenario and submit trade
   const checkSubmit = () => {
     // If depositing all SOL, inform user about insufficient lamports and reject 
-    if ($CURRENT_RESERVE?.abbrev === 'SOL' && inputAmount 
+    if ($CURRENT_RESERVE?.abbrev === 'SOL' && inputAmount && $TRADE_ACTION === 'deposit'
       && (walletBalances[$CURRENT_RESERVE.abbrev]?.uiAmountFloat - 0.02) <= inputAmount) {
       COPILOT.set({
         suggestion: {
@@ -671,7 +671,7 @@
             </td>
             <!--Faucet for testing if in development-->
             <!--Replace with inDevelopment for mainnet-->
-            {#if showAirdrop}
+            {#if inDevelopment}
               <td class="faucet" on:click={() => doAirdrop($rows[i])}>
                 <i class="text-gradient fas fa-parachute-box"
                   title={`Airdrop ${$rows[i].abbrev}`}
