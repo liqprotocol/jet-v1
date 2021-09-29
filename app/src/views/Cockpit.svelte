@@ -82,6 +82,10 @@
 
   // Change current reserve
   const changeReserve = (reserve: Reserve): void => {
+    if (sendingTrade) {
+      return;
+    }
+
     inputError = '';
     inputAmount = null;
     CURRENT_RESERVE.set(reserve);
@@ -185,7 +189,6 @@
              : 1
       );
     }
-    
   };
 
   // Update all market/user data
@@ -245,7 +248,8 @@
   // Check scenario and submit trade
   const checkSubmit = () => {
     // If depositing all SOL, inform user about insufficient lamports and reject 
-    if ($CURRENT_RESERVE?.abbrev === 'SOL' && walletBalances[$CURRENT_RESERVE.abbrev]?.uiAmountFloat === inputAmount) {
+    if ($CURRENT_RESERVE?.abbrev === 'SOL' && inputAmount 
+      && (walletBalances[$CURRENT_RESERVE.abbrev]?.uiAmountFloat - 0.02) <= inputAmount) {
       COPILOT.set({
         suggestion: {
           good: false,
@@ -691,6 +695,10 @@
       <div class="trade-action-select-container flex align-center justify-between">
         {#each ['deposit', 'withdraw', 'borrow', 'repay'] as action}
           <div on:click={() => {
+              if (sendingTrade) {
+                return;
+              }
+
               inputAmount = null;
               inputError = '';
               TRADE_ACTION.set(action);
