@@ -425,3 +425,9 @@ export interface ReserveMetadata {
     dexOpenOrders: number,
   },
 };
+
+// Notifications
+export interface Notification {
+  success: boolean,
+  text: string
+};

@@ -1,14 +1,16 @@
 import { BN } from '@project-serum/anchor';
 import type { AccountInfo as TokenAccountInfo, MintInfo, u64 } from '@solana/spl-token';
-import type { Market, AssetStore, Obligation } from '../models/JetTypes';
-import { MARKET, ASSETS, DARK_THEME, WALLET, WALLET_INIT } from '../store';
+import type { Market, AssetStore, Obligation, Notification } from '../models/JetTypes';
+import { MARKET, ASSETS, DARK_THEME, WALLET, WALLET_INIT, NOTIFICATIONS } from '../store';
 
 let wallet: any;
 let market: Market | null;
 let assets: AssetStore | null;
+let notifications: Notification[];
 WALLET.subscribe(data => wallet = data);
 MARKET.subscribe(data => market = data);
 ASSETS.subscribe(data => assets = data);
+NOTIFICATIONS.subscribe(data => notifications = data);
 
 // If user's browser has dark theme preference, set app to dark theme right on init
 export const initDarkTheme = () => {
@@ -104,6 +106,24 @@ export const timeout = (ms: number): Promise<boolean> => {
   return new Promise((res) => {
     setTimeout(() => res(true), ms);
   });
+};
+
+// Notification store
+export const addNotification = (notification: Notification) => {
+  const notifs = notifications;
+  notifs.push(notification);
+  const index = notifs.indexOf(notification);
+  NOTIFICATIONS.set(notifs);
+  setTimeout(() => {
+    if (notifications[index] && notifications[index].text === notification.text) {
+      clearNotification(index);
+    }
+  }, 4000);
+};
+export const clearNotification = (index: number): void => {
+  const notifs = notifications;
+  notifs.splice(index, 1);
+  NOTIFICATIONS.set(notifs);
 };
 
 // Calculate total value of deposits and borrowings, as well as c-ratio

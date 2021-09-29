@@ -7,7 +7,7 @@
   import type { Reserve, Obligation } from '../models/JetTypes';
   import { TRADE_ACTION, MARKET, ASSETS, CURRENT_RESERVE, NATIVE, COPILOT, PREFERRED_LANGUAGE, WALLET_INIT, INIT_FAILED, LIQUIDATION_WARNED } from '../store';
   import { inDevelopment, airdrop, deposit, withdraw, borrow, repay, getTransactionLogs } from '../scripts/jet';
-  import { currencyFormatter, totalAbbrev, getObligationData, TokenAmount, Amount } from '../scripts/utils';
+  import { currencyFormatter, totalAbbrev, addNotification, getObligationData, TokenAmount, Amount } from '../scripts/utils';
   import { generateCopilotSuggestion } from '../scripts/copilot';
   import { dictionary, definitions } from '../scripts/localization'; 
   import { explorerUrl } from '../scripts/programUtil';
@@ -83,10 +83,6 @@
 
   // Change current reserve
   const changeReserve = (reserve: Reserve): void => {
-    if (sendingTrade) {
-      return;
-    }
-
     inputError = '';
     inputAmount = null;
     CURRENT_RESERVE.set(reserve);
@@ -303,7 +299,6 @@
 
   // Check user input and submit trade RPC call
   const submitTrade = async (): Promise<void> => {
-    sendingTrade = true;
     if (!$CURRENT_RESERVE || !$ASSETS) {
       return;
     }
@@ -315,12 +310,12 @@
       return;
     }
 
+    sendingTrade = true;
+    let tradeAmount = inputAmount;
     let ok;
     let txid;
-    let tradeAmountString = inputAmount.toString();
-
     if ($TRADE_ACTION === 'deposit') {
-      if (TokenAmount.tokens(tradeAmountString, walletBalances[$CURRENT_RESERVE.abbrev]?.decimals).amount.gt(walletBalances[$CURRENT_RESERVE.abbrev]?.amount)) {
+      if (TokenAmount.tokens(tradeAmount.toString(), walletBalances[$CURRENT_RESERVE.abbrev]?.decimals).amount.gt(walletBalances[$CURRENT_RESERVE.abbrev]?.amount)) {
         inputError = dictionary[$PREFERRED_LANGUAGE].cockpit.notEnoughAsset
           .replaceAll('{{ASSET}}', $CURRENT_RESERVE.abbrev);
         inputAmount = null;
@@ -329,10 +324,10 @@
       }
 
       inputError = '';
-      const depositLamports = TokenAmount.tokens(tradeAmountString, $CURRENT_RESERVE.decimals).amount;
+      const depositLamports = TokenAmount.tokens(tradeAmount.toString(), $CURRENT_RESERVE.decimals).amount;
       [ok, txid] = await deposit($CURRENT_RESERVE.abbrev, depositLamports);
     } else if ($TRADE_ACTION === 'withdraw') {
-      if (TokenAmount.tokens(tradeAmountString, $CURRENT_RESERVE.decimals).amount.gt($CURRENT_RESERVE.availableLiquidity.amount)) {
+      if (TokenAmount.tokens(tradeAmount.toString(), $CURRENT_RESERVE.decimals).amount.gt($CURRENT_RESERVE.availableLiquidity.amount)) {
         inputAmount = null;
         inputError = dictionary[$PREFERRED_LANGUAGE].cockpit.noLiquidity;
         sendingTrade = false;
@@ -340,7 +335,7 @@
       }
 
       let collateralBalance = $ASSETS.tokens[$CURRENT_RESERVE.abbrev]?.collateralBalance;
-      if (TokenAmount.tokens(tradeAmountString, $CURRENT_RESERVE.decimals).amount.gt(collateralBalance.amount)) {
+      if (TokenAmount.tokens(tradeAmount.toString(), $CURRENT_RESERVE.decimals).amount.gt(collateralBalance.amount)) {
         inputAmount = null;
         inputError = dictionary[$PREFERRED_LANGUAGE].cockpit.lessFunds;
         sendingTrade = false;
@@ -348,20 +343,20 @@
       }
 
       inputError = '';
-      const withdrawLamports = TokenAmount.tokens(inputAmount.toString(), $CURRENT_RESERVE.decimals).amount;
-      const withdrawAmount = inputAmount === collateralBalances[$CURRENT_RESERVE.abbrev] ?
+      const withdrawLamports = TokenAmount.tokens(tradeAmount.toString(), $CURRENT_RESERVE.decimals).amount;
+      const withdrawAmount = tradeAmount === collateralBalances[$CURRENT_RESERVE.abbrev] ?
         Amount.depositNotes($ASSETS.tokens[$CURRENT_RESERVE.abbrev].collateralNoteBalance.amount) :
         Amount.tokens(withdrawLamports);
       [ok, txid] = await withdraw($CURRENT_RESERVE.abbrev, withdrawAmount);
     } else if ($TRADE_ACTION === 'borrow') {
-      if (TokenAmount.tokens(tradeAmountString, $CURRENT_RESERVE.decimals).amount.gt($CURRENT_RESERVE.availableLiquidity.amount)) {
+      if (TokenAmount.tokens(tradeAmount.toString(), $CURRENT_RESERVE.decimals).amount.gt($CURRENT_RESERVE.availableLiquidity.amount)) {
         inputAmount = null;
         inputError = dictionary[$PREFERRED_LANGUAGE].cockpit.noLiquidity;
         sendingTrade = false;
         return;
       }
 
-       if ((adjustedRatio && Math.ceil((adjustedRatio * 1000) / 1000) < $MARKET.minColRatio) || inputAmount > maxBorrowAmounts[$CURRENT_RESERVE.abbrev]) {
+       if ((adjustedRatio && Math.ceil((adjustedRatio * 1000) / 1000) < $MARKET.minColRatio) || tradeAmount > maxBorrowAmounts[$CURRENT_RESERVE.abbrev]) {
         inputAmount = null;
         inputError = dictionary[$PREFERRED_LANGUAGE].cockpit.belowMinCRatio;
         sendingTrade = false;
@@ -369,7 +364,7 @@
       }
 
       inputError = '';
-      const borrowLamports = TokenAmount.tokens(tradeAmountString, $CURRENT_RESERVE.decimals);
+      const borrowLamports = TokenAmount.tokens(tradeAmount.toString(), $CURRENT_RESERVE.decimals);
       const borrowAmount = Amount.tokens(borrowLamports.amount);
       [ok, txid] = await borrow($CURRENT_RESERVE.abbrev, borrowAmount);
     } else if ($TRADE_ACTION === 'repay') {
@@ -379,7 +374,7 @@
         return;
       }
 
-      if (TokenAmount.tokens(tradeAmountString, $CURRENT_RESERVE.decimals).amount.gt(loanBalance.amount)) {
+      if (TokenAmount.tokens(tradeAmount.toString(), $CURRENT_RESERVE.decimals).amount.gt(loanBalance.amount)) {
         inputAmount = null;
         inputError = dictionary[$PREFERRED_LANGUAGE].cockpit.oweLess;
         sendingTrade = false;
@@ -387,32 +382,25 @@
       }
 
       inputError = '';
-      const repayLamports = TokenAmount.tokens(inputAmount.toString(), $CURRENT_RESERVE.decimals).amount;
-      const repayAmount = inputAmount === loanBalances[$CURRENT_RESERVE.abbrev]
+      const repayLamports = TokenAmount.tokens(tradeAmount.toString(), $CURRENT_RESERVE.decimals).amount;
+      const repayAmount = tradeAmount === loanBalances[$CURRENT_RESERVE.abbrev]
         ? Amount.loanNotes($ASSETS.tokens[$CURRENT_RESERVE.abbrev].loanNoteBalance.amount)
         : Amount.tokens(repayLamports);
       [ok, txid] = await repay($CURRENT_RESERVE.abbrev, repayAmount);
     }
     
     if (ok && txid) {
-      COPILOT.set({
-        alert: {
-          good: true,
-          header: dictionary[$PREFERRED_LANGUAGE].copilot.alert.success,
-          text: dictionary[$PREFERRED_LANGUAGE].cockpit.txSuccess
-            .replaceAll('{{TRADE ACTION}}', $TRADE_ACTION)
-            .replaceAll('{{AMOUNT AND ASSET}}', `${inputAmount} ${$CURRENT_RESERVE.abbrev}`)
-            .replaceAll('{{EXPLORER LINK}}', explorerUrl(txid))
-        }
+      addNotification({
+        success: true,
+        text: dictionary[$PREFERRED_LANGUAGE].cockpit.txSuccess
+          .replaceAll('{{TRADE ACTION}}', $TRADE_ACTION)
+          .replaceAll('{{AMOUNT AND ASSET}}', `${tradeAmount} ${$CURRENT_RESERVE.abbrev}`)
       });
       inputAmount = null;
     } else if (!ok && !txid) {
-      COPILOT.set({
-        alert: {
-          good: false,
-          header: dictionary[$PREFERRED_LANGUAGE].copilot.alert.failed,
-          text: dictionary[$PREFERRED_LANGUAGE].cockpit.txFailed
-        }
+      addNotification({
+        success: false,
+        text: dictionary[$PREFERRED_LANGUAGE].cockpit.txFailed
       });
       inputAmount = null;
     }
@@ -696,10 +684,6 @@
       <div class="trade-action-select-container flex align-center justify-between">
         {#each ['deposit', 'withdraw', 'borrow', 'repay'] as action}
           <div on:click={() => {
-              if (sendingTrade) {
-                return;
-              }
-
               inputAmount = null;
               inputError = '';
               TRADE_ACTION.set(action);
