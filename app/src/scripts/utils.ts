@@ -93,6 +93,12 @@ export const totalAbbrev = (total: number, price?: number, native?: boolean, dig
   }
 };
 
+// Shorten a pubkey with ellipses
+export const shortenPubkey = (pubkey: string, halfLength: number): string => {
+  return `${pubkey.substring(0, halfLength)}...
+  ${pubkey.substring(pubkey.length - halfLength)}`;
+};
+
 // Manual timeout promise to pause program execution
 export const timeout = (ms: number): Promise<boolean> => {
   return new Promise((res) => {

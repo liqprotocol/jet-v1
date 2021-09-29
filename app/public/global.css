@@ -112,6 +112,9 @@ span {
 .bicyclette {
   font-family: 'Bicyclette', 'Roboto', sans-serif;
 }
+.bicyclette-bold {
+  font-family: 'Bicyclette-Bold', 'Roboto', sans-serif;
+}
 .jet-icons {
   font-family: 'Jet-Icons';
   font-size: 27px;
@@ -442,10 +445,18 @@ input[type=number] {
   border-top-right-radius: var(--round-radius) !important;
   border-bottom-right-radius: var(--round-radius) !important;
 }
-.datatable td.reserve-detail {
+.datatable .reserve-detail {
   font-size: 12px !important;
   font-family: 'Bicyclette-Bold', 'Roboto', sans-serif;
   text-transform: uppercase;
+  background-image: var(--gradient) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  padding-bottom: calc(var(--spacing-md) - 4px) !important;
+}
+.datatable td.text-gradient {
+  font-size: 12px !important;
+  font-weight: 500 !important;
   background-image: var(--gradient) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
@@ -522,6 +533,21 @@ input[type=number] {
 }
 .datatable .dt-bold {
   font-weight: 500 !important;
+}
+.transaction-logs .datatable {
+  box-shadow: unset !important;
+}
+.transaction-logs .datatable td{
+  min-width: 125px !important;
+}
+.transaction-logs .datatable td:last-of-type {
+  min-width: 30px !important;
+}
+.transaction-logs .datatable tr:hover {
+  box-shadow: var(--neu-shadow-inset-low) !important;
+}
+.transaction-logs .datatable tr .jet-icons {
+  margin-right: unset !important;
 }
 
 /* Tablet/Mobile styling */
@@ -610,5 +636,8 @@ input[type=number] {
   }
   .datatable td {
     font-size: 11px !important;
+  }
+  .transaction-logs .datatable td{
+    min-width: 70px !important;
   }
 }

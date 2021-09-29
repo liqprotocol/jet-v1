@@ -6,6 +6,7 @@
   import { initDarkTheme } from './scripts/utils';
   import Nav from './components/Nav.svelte';
   import Cockpit from './views/Cockpit.svelte';
+  import TransactionLogs from "./views/TransactionLogs.svelte";
   import Settings from './views/Settings.svelte';
   import Loader from './components/Loader.svelte';
   import Copilot from './components/Copilot.svelte';
@@ -31,6 +32,9 @@
   {#if launchUI}
     <Route path="/">
       <Cockpit />
+    </Route>
+    <Route path="/transactions">
+      <TransactionLogs />
     </Route>
     <Route path="/settings">
       <Settings />

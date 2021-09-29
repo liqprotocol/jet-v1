@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { useLocation } from 'svelte-navigator';
   import { WALLET, ASSETS, DARK_THEME, PREFERRED_LANGUAGE } from '../store';
-  import { disconnectWallet, setDark } from '../scripts/utils';
+  import { disconnectWallet, setDark, shortenPubkey } from '../scripts/utils';
   import { dictionary } from '../scripts/localization';
   import { generateCopilotSuggestion } from '../scripts/copilot';
   import Logo from './Logo.svelte';
@@ -45,6 +45,10 @@
     <NavLink active={$location.pathname === '/'} 
       path="/" icon={$location.pathname === '/' ? '✔' : '✈'}
       text={expanded ? dictionary[$PREFERRED_LANGUAGE].nav.cockpit : ''} 
+    />
+    <NavLink active={$location.pathname === '/transactions'} 
+      path='/transactions' icon={$location.pathname === '/transactions' ? '➺' : '➸'}
+      text={expanded ? dictionary[$PREFERRED_LANGUAGE].nav.transactions : ''} 
     />
     <NavLink active={$location.pathname === '/settings'} 
       path='/settings' icon={$location.pathname === '/settings' ? '✎' : '✀'}
@@ -89,9 +93,7 @@
           />
           {#if expanded}
             <span class="text-gradient">
-              {$WALLET.publicKey.toString().substring(0, 4)}...{$WALLET.publicKey.toString().substring(
-                $WALLET.publicKey.toString().length - 4
-              )}
+              {shortenPubkey($WALLET.publicKey.toString(), 4)}
             </span>
           {/if}
         </div>
@@ -121,6 +123,10 @@
       path="/" icon={$location.pathname === '/' ? '✔' : '✈'} 
       text={dictionary[$PREFERRED_LANGUAGE].nav.cockpit} 
     />
+    <NavLink active={$location.pathname === '/transactions'} 
+      path='/transactions' icon={$location.pathname === '/transactions' ? '➺' : '➸'} 
+      text={dictionary[$PREFERRED_LANGUAGE].nav.transactions} 
+    />
     <NavLink active={$location.pathname === '/settings'} 
       path='/settings' icon={$location.pathname === '/settings' ? '✎' : '✀'} 
       text={dictionary[$PREFERRED_LANGUAGE].nav.settings} 
@@ -147,10 +153,7 @@
           alt={`${$WALLET.name} Logo`}
         />
         <span class="text-gradient">
-          {$WALLET.publicKey.toString().substring(0, 4)}..
-          {$WALLET.publicKey.toString().substring(
-            $WALLET.publicKey.toString().length - 4
-          )}
+          {shortenPubkey($WALLET.publicKey.toString(), 4)}
         </span>
       </div>
     {/if}
@@ -162,6 +165,9 @@
 	<div class="top flex align-center justify-evenly">
     <NavLink active={$location.pathname === '/'} 
       path="/" icon={$location.pathname === '/' ? '✔' : '✈'} 
+    />
+    <NavLink active={$location.pathname === '/transactions'} 
+      path='/transactions' icon={$location.pathname === '/transactions' ? '➺' : '➸'} 
     />
     <NavLink active={$location.pathname === '/settings'} 
       path='/settings' icon={$location.pathname === '/settings' ? '✎' : '✀'} 
