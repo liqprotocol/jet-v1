@@ -183,10 +183,12 @@ export const getWalletAndAnchor = async (provider: WalletProvider): Promise<void
 
 // Get Jet transactions and associated UI data
 export const getTransactionLogs = async (): Promise<void> => {
+  // Reset global store
+  TRANSACTION_LOGS.set(null);
   // Establish solana connection and get all confirmed signatures
   // associated with user's wallet pubkey
   const txLogs: TransactionLog[] = [];
-  const solanaConnection = new anchor.web3.Connection(`https://api.${inDevelopment? 'devnet' : 'mainnet-beta'}.solana.com/`);
+  const solanaConnection = new anchor.web3.Connection(`https://api.${inDevelopment ? 'devnet' : 'mainnet-beta'}.solana.com/`);
   const sigs = await solanaConnection.getConfirmedSignaturesForAddress2(wallet.publicKey); 
   for (let sig of sigs) {
     // Get confirmed transaction from each signature

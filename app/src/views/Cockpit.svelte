@@ -10,13 +10,11 @@
   import { currencyFormatter, totalAbbrev, addNotification, getObligationData, TokenAmount, Amount } from '../scripts/utils';
   import { generateCopilotSuggestion } from '../scripts/copilot';
   import { dictionary, definitions } from '../scripts/localization'; 
-  import { explorerUrl } from '../scripts/programUtil';
   import Loader from '../components/Loader.svelte';
   import ConnectWallet from '../components/ConnectWallet.svelte';
   import ReserveDetail from '../components/ReserveDetail.svelte';
   import Toggle from '../components/Toggle.svelte';
   import InitFailed from '../components/InitFailed.svelte';
-import Logo from '../components/Logo.svelte';
 
   let marketTVL: number = 0;
   let walletBalances: Record<string, TokenAmount> = {};
@@ -282,7 +280,7 @@ import Logo from '../components/Logo.svelte';
         });
       }
     // If trade would result in possible undercollateralization, inform user
-    } else if ((obligation?.borrowedValue || $TRADE_ACTION === 'borrow') 
+    } else if ((obligation?.borrowedValue || $TRADE_ACTION === 'borrow') && adjustedRatio < obligation?.colRatio
       && adjustedRatio <= $MARKET.minColRatio + 0.2 && adjustedRatio >= $MARKET.minColRatio) {
         COPILOT.set({
           suggestion: {

@@ -19,17 +19,6 @@
       searchInput: false
     }
   };
-
-  // Reactive statement to update data
-  // on any account change every 10 seconds
-  let updateTime: number = 0;
-  $: if ($ASSETS || $TRANSACTION_LOGS) {
-    const currentTime = performance.now();
-    if (currentTime > updateTime) {
-      getTransactionLogs();
-      updateTime = currentTime + 10000;
-    }
-  }
 </script>
 
 <div class="view-container flex justify-center column">
@@ -56,7 +45,9 @@
             {dictionary[$PREFERRED_LANGUAGE].transactions.tradeAmount} 
           </th>
           <th data-key="">
-            <!--Empty column for arrow-->
+            <i class="text-gradient fas fa-sync"
+              on:click={() => getTransactionLogs()}>
+            </i>
           </th>
         </thead>
         <div class="datatable-divider">
