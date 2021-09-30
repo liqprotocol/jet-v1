@@ -535,6 +535,7 @@ input[type=number] {
   font-weight: 500 !important;
 }
 .transaction-logs .datatable {
+  padding: unset !important;
   box-shadow: unset !important;
 }
 .transaction-logs .datatable td {

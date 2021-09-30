@@ -107,9 +107,6 @@
 </div>
 
 <style>
-  .transaction-logs {
-    padding: var(--spacing-lg) 0;
-  }
   .transaction-logs th {
     text-align: left !important;
   }
