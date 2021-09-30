@@ -5,28 +5,30 @@
   import { clearNotification } from '../scripts/utils';
 </script>
 
-<div class="notifications flex align-center justify-center column">
-  {#each $NOTIFICATIONS as n, i}
-    <div class="notification flex align-center justify-center"
-      class:success={n.success}
-      in:fly={{y: 50, duration: 500}}
-      out:fade={{duration: 50}}>
-      <div class="copilot-img flex align-center justify-center"
-        on:click={() => {if (n.success) navigate("/transactions")}}>
-        <img src="img/copilot/copilot.png" 
-          alt="Copilot Icon"
-        />
+{#if $NOTIFICATIONS.length}
+  <div class="notifications flex align-center justify-center column">
+    {#each $NOTIFICATIONS as n, i}
+      <div class="notification flex align-center justify-center"
+        class:success={n.success}
+        in:fly={{y: 50, duration: 500}}
+        out:fade={{duration: 50}}>
+        <div class="copilot-img flex align-center justify-center"
+          on:click={() => {if (n.success) navigate("/transactions")}}>
+          <img src="img/copilot/copilot.png" 
+            alt="Copilot Icon"
+          />
+        </div>
+        <p on:click={() => {if (n.success) navigate("/transactions")}}>
+          {@html n.text}
+        </p>
+        <i class="jet-icons close"
+          on:click={() => clearNotification(i)}>
+          ✕
+        </i>
       </div>
-      <p on:click={() => {if (n.success) navigate("/transactions")}}>
-        {@html n.text}
-      </p>
-      <i class="jet-icons close"
-        on:click={() => clearNotification(i)}>
-        ✕
-      </i>
-    </div>
-  {/each}
-</div>
+    {/each}
+  </div>
+{/if}
 
 <style>
   .notifications {
