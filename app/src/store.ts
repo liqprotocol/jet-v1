@@ -1,5 +1,5 @@
 import type * as anchor from '@project-serum/anchor';
-import type { Market, Reserve, AssetStore, Copilot, Locale, TransactionLog } from './models/JetTypes';
+import type { Market, Reserve, AssetStore, Copilot, Locale, TransactionLog, Notification } from './models/JetTypes';
 import { writable } from 'svelte/store';
 
 // Writable value stores
@@ -20,3 +20,4 @@ export const PING = writable<number> (0);
 export const LIQUIDATION_WARNED = writable<boolean> (false);
 export const WALLET_INIT = writable<boolean> (false);
 export const INIT_FAILED = writable<{ geobanned: boolean } | null> (null);
+export const NOTIFICATIONS = writable<Notification[]> ([]);
