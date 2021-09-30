@@ -537,7 +537,7 @@ input[type=number] {
 .transaction-logs .datatable {
   box-shadow: unset !important;
 }
-.transaction-logs .datatable td{
+.transaction-logs .datatable td {
   min-width: 125px !important;
 }
 .transaction-logs .datatable td:last-of-type {
@@ -637,7 +637,7 @@ input[type=number] {
   .datatable td {
     font-size: 11px !important;
   }
-  .transaction-logs .datatable td{
+  .transaction-logs .datatable td {
     min-width: 70px !important;
   }
 }
