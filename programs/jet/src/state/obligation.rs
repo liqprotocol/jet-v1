@@ -78,8 +78,6 @@ impl Obligation {
         collateral_account: &Pubkey,
         deposit_notes_amount: Number,
     ) -> ProgramResult {
-        Self::validate(collateral_account, &self.collateral(), &self.loans())?;
-
         self.cached_mut().invalidate();
         self.collateral_mut()
             .add(collateral_account, deposit_notes_amount)
@@ -91,8 +89,6 @@ impl Obligation {
         collateral_account: &Pubkey,
         deposit_notes_amount: Number,
     ) -> ProgramResult {
-        Self::validate(collateral_account, &self.collateral(), &self.loans())?;
-
         self.cached_mut().invalidate();
         self.collateral_mut()
             .subtract(collateral_account, deposit_notes_amount)
@@ -100,30 +96,14 @@ impl Obligation {
 
     /// Record the loan borrowed from an obligation (borrow notes deposited)
     pub fn borrow(&mut self, loan_account: &Pubkey, loan_notes_amount: Number) -> ProgramResult {
-        Self::validate(loan_account, &self.loans(), &self.collateral())?;
-
         self.cached_mut().invalidate();
         self.loans_mut().add(loan_account, loan_notes_amount)
     }
 
     /// Record the loan repaid from an obligation (borrow notes burned)
     pub fn repay(&mut self, loan_account: &Pubkey, loan_notes_amount: Number) -> ProgramResult {
-        Self::validate(loan_account, &self.loans(), &self.collateral())?;
-
         self.cached_mut().invalidate();
         self.loans_mut().subtract(loan_account, loan_notes_amount)
-    }
-
-    fn validate(
-        account: &Pubkey,
-        active: &ObligationSide,
-        passive: &ObligationSide,
-    ) -> Result<(), ErrorCode> {
-        let position = active.position(account)?;
-        if passive.reserve_balance(position.reserve_index) != 0 {
-            return Err(ErrorCode::SimultaneousDepositAndBorrow);
-        }
-        Ok(())
     }
 
     /// Be smarter about compute
@@ -181,11 +161,11 @@ impl Obligation {
         repay_notes_amount: Number,
     ) -> Result<Number, ErrorCode> {
         let loan_total = self.loan_value(market, current_slot);
-        let loan_position = self.loans().position(&loan_account)?;
-        let loan_reserve = market.get_cached(loan_position.reserve_index, current_slot);
+        let loan = self.loans().position(&loan_account)?;
+        let loan_reserve = market.get_cached(loan.reserve_index, current_slot);
 
         let collateral_total = self.collateral_value(market, current_slot);
-        let collateral = self.collateral_mut().position_mut(collateral_account)?;
+        let collateral = self.collateral_mut().position(collateral_account)?;
         let collateral_reserve = market.get_cached(collateral.reserve_index, current_slot);
 
         // calculate the value of the debt being repaid
@@ -202,12 +182,18 @@ impl Obligation {
         let loan_to_value = loan_total / collateral_total;
         let c_ratio_ltv = min_c_ratio * loan_to_value;
 
-        if c_ratio_ltv < Number::ONE {
+        let collateral_max_value = if c_ratio_ltv < Number::ONE {
             // This means the loan is over-collateralized, so we shouldn't allow
             // any liquidation for it.
             msg!("c_ratio_ltv < 1 implies this cannot be liquidated");
             return Err(ErrorCode::ObligationHealthy.into());
-        }
+        } else if c_ratio_ltv >= min_c_ratio {
+            // This means the loan is under-collateralized, so force liquidator
+            // to take the loss.
+            collateral_total * repaid_ratio
+        } else {
+            collateral_total
+        };
 
         let limit_fraction = (c_ratio_ltv - Number::ONE)
             / (min_c_ratio * (Number::ONE - liquidation_bonus) - Number::ONE);
@@ -216,7 +202,6 @@ impl Obligation {
 
         // Limit collateral to allow for withdrawl by a liquidator, based on the
         // collateral amount to the ratio of the overall debt being repaid.
-        let collateral_max_value = collateral_total * repaid_ratio;
         let collateral_max_value = std::cmp::min(collateral_max_value, collateral_sellable_value);
 
         let collateral_max_notes = collateral_max_value
@@ -225,7 +210,8 @@ impl Obligation {
 
         let collateral_max_notes = std::cmp::min(collateral_max_notes, collateral.amount);
 
-        collateral.amount.saturating_sub(repay_notes_amount);
+        let collateral = self.collateral_mut().position_mut(collateral_account)?;
+        collateral.amount = collateral.amount.saturating_sub(collateral_max_notes);
 
         Ok(collateral_max_notes)
     }
@@ -393,7 +379,7 @@ impl ObligationSide {
     /// Record the loan repaid from an obligation (borrow notes burned)
     fn subtract(&mut self, account: &Pubkey, notes_amount: Number) -> ProgramResult {
         let position = self.position_mut(account)?;
-        position.amount -= notes_amount;
+        position.amount = position.amount.saturating_sub(notes_amount);
         Ok(())
     }
 
@@ -422,15 +408,6 @@ impl ObligationSide {
             .find(|p| p.account == *account)
             .ok_or(ErrorCode::UnregisteredPosition)?;
         Ok(position)
-    }
-
-    /// Return the balance for a reserve. If not found, returns 0.
-    fn reserve_balance(&self, reserve_index: ReserveIndex) -> u64 {
-        self.positions
-            .iter()
-            .find(|p| p.reserve_index == reserve_index)
-            .map(|p| p.amount.as_u64(0))
-            .unwrap_or(0)
     }
 
     pub fn market_value(&self, market_info: &MarketReserves, current_slot: u64) -> PositionValue {

@@ -195,23 +195,25 @@ impl Reserve {
     pub fn deposit(&mut self, token_amount: u64, note_amount: u64) {
         let state = self.state_mut().get_stale_mut();
 
-        state.total_deposits += token_amount;
-        state.total_deposit_notes += note_amount;
+        state.total_deposits = state.total_deposits.checked_add(token_amount).unwrap();
+        state.total_deposit_notes = state.total_deposit_notes.checked_add(note_amount).unwrap();
     }
 
     /// Record an amount of tokens withdrawn from the reserve
     pub fn withdraw(&mut self, token_amount: u64, note_amount: u64) {
         let state = self.state_mut().get_stale_mut();
 
-        state.total_deposits -= token_amount;
-        state.total_deposit_notes -= note_amount;
+        state.total_deposits = state.total_deposits.checked_sub(token_amount).unwrap();
+        state.total_deposit_notes = state.total_deposit_notes.checked_sub(note_amount).unwrap();
     }
 
-    pub fn borrow_fee(&self, token_amount: u64) -> Number {
+    /// Calculates the borrow fee token amount for
+    /// an amount of tokens to be borrowed from the reserve.
+    pub fn borrow_fee(&self, token_amount: u64) -> u64 {
         let origination_fee = Number::from_bps(self.config.loan_origination_fee);
         let fee_owed = origination_fee * token_amount;
 
-        fee_owed
+        fee_owed.as_u64_ceil(0)
     }
 
     /// Record an amount of tokens to be borrowed from the reserve.
@@ -223,16 +225,18 @@ impl Reserve {
         current_slot: u64,
         token_amount: u64,
         note_amount: u64,
-        fees: Number,
+        fees: u64,
     ) -> u64 {
         let debt_owed = Number::from(token_amount);
 
         let state = self.unwrap_state_mut(current_slot);
 
-        state.outstanding_debt += debt_owed + fees;
+        let fees = Number::from_decimal(fees, 0);
+
         state.uncollected_fees += fees;
-        state.total_deposits -= token_amount;
-        state.total_loan_notes += note_amount;
+        state.outstanding_debt += debt_owed + fees;
+        state.total_deposits = state.total_deposits.checked_sub(token_amount).unwrap();
+        state.total_loan_notes = state.total_loan_notes.checked_add(note_amount).unwrap();
 
         debt_owed.as_u64(0)
     }
@@ -242,8 +246,8 @@ impl Reserve {
         let state = self.unwrap_state_mut(current_slot);
 
         state.outstanding_debt -= Number::from(token_amount);
-        state.total_loan_notes -= note_amount;
-        state.total_deposits += token_amount;
+        state.total_loan_notes = state.total_loan_notes.checked_sub(note_amount).unwrap();
+        state.total_deposits = state.total_deposits.checked_add(token_amount).unwrap();
     }
 
     /// Record an amount of tokens added to the vault which need
@@ -251,7 +255,7 @@ impl Reserve {
     pub fn add_uncollected_fees(&mut self, current_slot: u64, amount: u64) {
         let state = self.unwrap_state_mut(current_slot);
         state.uncollected_fees += Number::from(amount);
-        state.total_deposits += amount;
+        state.total_deposits = state.total_deposits.checked_add(amount).unwrap();
     }
 
     /// Calculate the exchange rate for deposit notes (tokens per note)
@@ -315,7 +319,7 @@ impl Reserve {
 
             state.outstanding_debt += new_interest_accrued;
             state.uncollected_fees += fee_to_collect;
-            state.accrued_until += time_to_accrue;
+            state.accrued_until = state.accrued_until.checked_add(time_to_accrue).unwrap();
         }
 
         if time_behind == time_to_accrue {
@@ -342,7 +346,7 @@ impl Reserve {
         let fee_notes = (state.uncollected_fees / exchange_rate).as_u64(0);
 
         state.uncollected_fees = Number::ZERO;
-        state.total_deposit_notes += fee_notes;
+        state.total_deposit_notes = state.total_deposit_notes.checked_add(fee_notes).unwrap();
 
         fee_notes
     }
@@ -399,6 +403,7 @@ impl Reserve {
         let borrow_2 = Number::from_bps(self.config.borrow_rate_2);
 
         if util_rate <= util_2 {
+            // Second regime
             let borrow_1 = Number::from_bps(self.config.borrow_rate_1);
 
             return Reserve::interpolate(util_rate, util_1, util_2, borrow_1, borrow_2);
@@ -406,7 +411,13 @@ impl Reserve {
 
         let borrow_3 = Number::from_bps(self.config.borrow_rate_3);
 
-        Reserve::interpolate(util_rate, util_2, Number::ONE, borrow_2, borrow_3)
+        if util_rate < Number::ONE {
+            // Third regime
+            return Reserve::interpolate(util_rate, util_2, Number::ONE, borrow_2, borrow_3);
+        }
+
+        // Maximum interest
+        borrow_3
     }
 
     /// Linear interpolation between (x0, y0) and (x1, y1).

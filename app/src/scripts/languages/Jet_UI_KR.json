@@ -9,11 +9,11 @@
     },
     "nav": {
         "cockpit": "조종실",
+        "transactions": "Flight Logs",
         "settings": "설정",
         "collapse": "붕괴",
         "getCopilotSuggestion": "부조종사 의견 받기",
-        "disconnectWallet": "지갑 연결 해제",
-        "transactions": "Flight Logs"
+        "disconnectWallet": "지갑 연결 해제"
     },
     "cockpit": {
         "title": "조종실",
@@ -67,6 +67,14 @@
         "rejectTrade": "이 거래는 담보 비율을 {{NEW-C-RATIO}}%로 낮추어서, 이는 {{JET MIN C-RATIO}}의 최소 비율보다 낮을 것입니다. 이 대출에는 {{ORIGINATION FEE}}%의 수수료가 부과됩니다. 그래도 대출 하시겠습니까?",
         "insufficientLamports": "거래 수수료에 대한 부담 없이 모든 SOL을 예치하고 있습니다! 약간 낮은 양으로 다시 시도하십시오.",
         "stillUndercollateralized": "Your new C-ratio of {{NEW-C-RATIO}}% is still under Jet's minimum marketplace collateralization ratio of {{JET MIN C-RATIO}}%. Please consider repaying more to avoid liquidation."
+    },
+    "transactions": {
+      "title": "Flight Logs",
+      "date": "Date",
+      "signature": "Signature",
+      "tradeAction": "Transaction",
+      "tradeAmount": "Amount",
+      "noTrades": "You have no logged transactions with Jet."
     },
     "settings": {
         "title": "설정",
@@ -137,12 +145,5 @@
             "originationFee": "이 대출에는 {{ORIGINATION FEE}}%의 수수료가 부과됩니다.",
             "headsup": "예의주시하세요!"
         }
-    },
-    "transactions": {
-        "title": "Flight Logs",
-        "date": "Date",
-        "signature": "Signature",
-        "tradeAction": "Transaction",
-        "tradeAmount": "Amount"
     }
 }

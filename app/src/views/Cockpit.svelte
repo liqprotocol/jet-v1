@@ -82,6 +82,10 @@
 
   // Change current reserve
   const changeReserve = (reserve: Reserve): void => {
+    if (sendingTrade) {
+      return;
+    }
+
     inputError = '';
     inputAmount = null;
     CURRENT_RESERVE.set(reserve);
@@ -695,6 +699,10 @@
       <div class="trade-action-select-container flex align-center justify-between">
         {#each ['deposit', 'withdraw', 'borrow', 'repay'] as action}
           <div on:click={() => {
+              if (sendingTrade) {
+                return;
+              }
+
               inputAmount = null;
               inputError = '';
               TRADE_ACTION.set(action);
@@ -812,8 +820,8 @@
           class:active={inputAmount} class:disabled={disabledInput}>
           <input on:keyup={() => adjustCollateralizationRatio()}
             on:keypress={(e) => {
-              if (e.code === 'Enter') {
-                checkSubmit();
+              if (e.key === "Enter"){
+                return checkSubmit()
               }
             }}
             on:click={() => inputError = ''}
