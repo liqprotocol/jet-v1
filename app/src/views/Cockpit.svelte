@@ -156,32 +156,37 @@
   // Adjust user input and calculate updated c-ratio if 
   // they were to submit current trade
   const adjustCollateralizationRatio = (): void => {
-    if (!$CURRENT_RESERVE || !$ASSETS) {
+    if (!$CURRENT_RESERVE || !$ASSETS || inputAmount === null) {
       return;
     }
 
+    // If input is negative, reset to zero
+    if (inputAmount < 0) {
+      inputAmount = 0;
+    }
+
     if ($TRADE_ACTION === 'deposit') {
-      adjustedRatio = (obligation.depositedValue + ((inputAmount ?? 0) * $CURRENT_RESERVE.price)) / (
+      adjustedRatio = (obligation.depositedValue + inputAmount * $CURRENT_RESERVE.price) / (
           obligation.borrowedValue > 0
             ? obligation.borrowedValue
               : 1
         );
     } else if ($TRADE_ACTION === 'withdraw') {
-      adjustedRatio = (obligation.depositedValue - ((inputAmount ?? 0) * $CURRENT_RESERVE.price)) / (
+      adjustedRatio = (obligation.depositedValue - inputAmount * $CURRENT_RESERVE.price) / (
           obligation.borrowedValue > 0 
             ? obligation.borrowedValue
               : 1
         );
     } else if ($TRADE_ACTION === 'borrow') {
       adjustedRatio = obligation.depositedValue / (
-          (obligation.borrowedValue + ((inputAmount ?? 0) * $CURRENT_RESERVE.price)) > 0
+          (obligation.borrowedValue + inputAmount * $CURRENT_RESERVE.price) > 0
             ? (obligation.borrowedValue + ((inputAmount ?? 0) * $CURRENT_RESERVE.price))
               : 1
         );
     } else if ($TRADE_ACTION === 'repay') {
       adjustedRatio = obligation.depositedValue / (
-          (obligation.borrowedValue - ((inputAmount ?? 0) * $CURRENT_RESERVE.price))
-            ? (obligation.borrowedValue - ((inputAmount ?? 0) * $CURRENT_RESERVE.price))
+          (obligation.borrowedValue - inputAmount * $CURRENT_RESERVE.price)
+            ? (obligation.borrowedValue - inputAmount * $CURRENT_RESERVE.price)
              : 1
       );
     }
@@ -243,6 +248,10 @@
 
   // Check scenario and submit trade
   const checkSubmit = () => {
+    if (disabledInput) {
+      return;
+    }
+
     // If depositing all SOL, inform user about insufficient lamports and reject 
     if ($CURRENT_RESERVE?.abbrev === 'SOL' && inputAmount && $TRADE_ACTION === 'deposit'
       && (walletBalances[$CURRENT_RESERVE.abbrev]?.uiAmountFloat - 0.02) <= inputAmount) {
