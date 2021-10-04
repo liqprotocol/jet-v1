@@ -5,8 +5,8 @@ import { ASSOCIATED_TOKEN_PROGRAM_ID, NATIVE_MINT } from "@solana/spl-token";
 import { AccountLayout as TokenAccountLayout, Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
 import Rollbar from 'rollbar';
 import WalletAdapter from './walletAdapter';
-import type { Reserve, AssetStore, SolWindow, WalletProvider, Wallet, Asset, Market, MathWallet, SolongWallet, TransactionLog } from '../models/JetTypes';
-import { MARKET, WALLET, ASSETS, TRANSACTION_LOGS, PROGRAM, PREFERRED_NODE, WALLET_INIT, CURRENT_RESERVE, INIT_FAILED } from '../store';
+import type { Reserve, AssetStore, SolWindow, WalletProvider, Wallet, Asset, Market, MathWallet, SolongWallet, CustomProgramError, TransactionLog } from '../models/JetTypes';
+import { MARKET, WALLET, ASSETS, TRANSACTION_LOGS, PROGRAM, PREFERRED_NODE, WALLET_INIT, CUSTOM_PROGRAM_ERRORS, ANCHOR_WEB3_CONNECTION, ANCHOR_CODER, IDL_METADATA, INIT_FAILED, CURRENT_RESERVE } from '../store';
 import { subscribeToAssets, subscribeToMarket } from './subscribe';
 import { findDepositNoteAddress, findDepositNoteDestAddress, findLoanNoteAddress, findObligationAddress, sendTransaction, transactionErrorToString, findCollateralAddress, SOL_DECIMALS, parseIdlMetadata, sendAllTransactions, InstructionAndSigner, explorerUrl } from './programUtil';
 import { Amount, TokenAmount } from './utils';
@@ -26,12 +26,18 @@ let assets: AssetStore | null;
 let program: anchor.Program | null;
 let market: Market;
 let idl: any;
+let customProgramErrors: CustomProgramError[];
+let connection: anchor.web3.Connection;
+let coder: anchor.Coder;
 WALLET.subscribe(data => wallet = data);
 ASSETS.subscribe(data => assets = data);
 PROGRAM.subscribe(data => program = data);
 MARKET.subscribe(data => market = data);
+CUSTOM_PROGRAM_ERRORS.subscribe(data => customProgramErrors = data);
+ANCHOR_WEB3_CONNECTION.subscribe(data => connection = data);
+ANCHOR_CODER.subscribe(data => coder = data);
 
-// Development environment variable
+// Development / Devnet identifier
 export const inDevelopment: boolean = jetDev || window.location.hostname.indexOf('devnet') !== -1;
 
 // Rollbar error logging
@@ -44,12 +50,6 @@ export const rollbar = new Rollbar({
   }
 });
 
-// Cast solana injected window type
-const solWindow = window as unknown as SolWindow;
-
-// Establish Anchor variables
-let connection: anchor.web3.Connection;
-let coder: anchor.Coder;
 
 // Record of instructions to their first 8 bytes for transaction logs
 const INSTRUCTION_BYTES: Record<string, number[]> = {
@@ -64,6 +64,10 @@ export const getMarketAndIDL = async (): Promise<void> => {
   // Fetch IDL and preferred RPC Node
   const resp = await fetch('idl/jet.json');
   idl = await resp.json();
+  IDL_METADATA.set(parseIdlMetadata(idl.metadata));
+  CUSTOM_PROGRAM_ERRORS.set(idl.errors);
+
+  // Establish web3 connection
   const idlMetadata = parseIdlMetadata(idl.metadata);
   const preferredNode = localStorage.getItem('jetPreferredNode');
   PREFERRED_NODE.set(preferredNode);
@@ -72,11 +76,19 @@ export const getMarketAndIDL = async (): Promise<void> => {
   // Establish and test web3 connection
   // If error log it and display failure component
   try {
-    connection = new anchor.web3.Connection(
+    const anchorConnection = new anchor.web3.Connection(
       preferredNode ?? idlMetadata.cluster, 
       (anchor.Provider.defaultOptions()).commitment
     );
+    ANCHOR_WEB3_CONNECTION.set(anchorConnection);
+  } catch {
+    localStorage.removeItem('jetPreferredNode');
+    const anchorConnection = new anchor.web3.Connection(idlMetadata.cluster, (anchor.Provider.defaultOptions()).commitment);
+    ANCHOR_WEB3_CONNECTION.set(anchorConnection);
+  }
+  ANCHOR_CODER.set(new anchor.Coder(idl));
 
+  try {
     await connection.getVersion();
     INIT_FAILED.set(null);
   } catch (err) {
@@ -139,6 +151,9 @@ export const getMarketAndIDL = async (): Promise<void> => {
 
 // Connect to user's wallet
 export const getWalletAndAnchor = async (provider: WalletProvider): Promise<void> => {
+  // Cast solana injected window type
+  const solWindow = window as unknown as SolWindow;
+
   // Wallet adapter or injected wallet setup
   if (provider.name === 'Phantom' && solWindow.solana?.isPhantom) {
     wallet = solWindow.solana as unknown as Wallet;
@@ -183,6 +198,10 @@ export const getWalletAndAnchor = async (provider: WalletProvider): Promise<void
 
 // Get Jet transactions and associated UI data
 export const getTransactionLogs = async (): Promise<void> => {
+  if (!wallet?.publicKey) {
+    return;
+  }
+  
   // Reset global store
   TRANSACTION_LOGS.set(null);
   // Establish solana connection and get all confirmed signatures
@@ -230,8 +249,10 @@ export const getTransactionLogs = async (): Promise<void> => {
               log.blockDate = new Date(log.blockTime * 1000).toLocaleDateString();
               // Explorer URL
               log.explorerUrl = explorerUrl(log.signature);
-              // Add tx to logs
-              txLogs.push(log);
+              // If we found mint match, add tx to logs
+              if (log.tokenAbbrev) {
+                txLogs.push(log);
+              }
             }
           }
         }
@@ -620,17 +641,43 @@ export const borrow = async (abbrev: string, amount: Amount)
   const reserve = market.reserves[abbrev];
   const asset = assets.tokens[abbrev];
 
+  let receiverAccount = asset.walletTokenPubkey;
+
   // Create token account ix
   let createTokenAccountIx: TransactionInstruction | undefined;
 
   // Create loan note token ix
   let initLoanAccountIx: TransactionInstruction | undefined;
 
-  // Close account ixs for unwrapping SOL
+  // Wrapped sol ixs
+  let wsolKeypair: Keypair | undefined;
+  let createWsolTokenAccountIx: TransactionInstruction | undefined;
+  let initWsoltokenAccountIx: TransactionInstruction | undefined;
   let closeTokenAccountIx: TransactionInstruction | undefined;
 
-  // Create the wallet token account if it doesn't exist
-  if (!asset.walletTokenExists) {
+  if (asset.tokenMintPubkey.equals(NATIVE_MINT)) {
+    // Create a token account to receive wrapped sol.
+    // There isn't an easy way to unwrap sol without
+    // closing the account, so we avoid closing the 
+    // associated token account.
+    const rent = await Token.getMinBalanceRentForExemptAccount(connection);
+    
+    wsolKeypair = Keypair.generate();
+    receiverAccount = wsolKeypair.publicKey;
+    createWsolTokenAccountIx = SystemProgram.createAccount({
+      fromPubkey: wallet.publicKey,
+      newAccountPubkey: wsolKeypair.publicKey,
+      programId: TOKEN_PROGRAM_ID,
+      space: TokenAccountLayout.span,
+      lamports: rent,
+    })
+    initWsoltokenAccountIx = Token.createInitAccountInstruction(
+      TOKEN_PROGRAM_ID, 
+      reserve.tokenMintPubkey, 
+      wsolKeypair.publicKey, 
+      wallet.publicKey);
+  } else if (!asset.walletTokenExists) {
+    // Create the wallet token account if it doesn't exist
     createTokenAccountIx = Token.createAssociatedTokenAccountInstruction(
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
@@ -676,17 +723,17 @@ export const borrow = async (abbrev: string, amount: Amount)
 
       borrower: wallet.publicKey,
       loanAccount: asset.loanNotePubkey,
-      receiverAccount: asset.walletTokenPubkey,
+      receiverAccount,
 
       tokenProgram: TOKEN_PROGRAM_ID,
     },
   });
 
-  // If withdrawing SOL, unwrap it first
+  // If withdrawing SOL, unwrap it by closing
   if (asset.tokenMintPubkey.equals(NATIVE_MINT)) {
     closeTokenAccountIx = Token.createCloseAccountInstruction(
       TOKEN_PROGRAM_ID,
-      asset.walletTokenPubkey,
+      receiverAccount,
       wallet.publicKey,
       wallet.publicKey,
       []);
@@ -696,8 +743,11 @@ export const borrow = async (abbrev: string, amount: Amount)
     {
       ix: [
         createTokenAccountIx,
+        createWsolTokenAccountIx,
+        initWsoltokenAccountIx,
         initLoanAccountIx,
       ].filter(ix => ix) as TransactionInstruction[],
+      signers: [wsolKeypair].filter(ix => ix) as Signer[],
     },
     {
       ix: [
@@ -733,7 +783,7 @@ export const repay = async (abbrev: string, amount: Amount)
 
   const reserve = market.reserves[abbrev];
   const asset = assets.tokens[abbrev];
-  let depositSourcePubkey: PublicKey | undefined;
+  let depositSourcePubkey = asset.walletTokenPubkey;
 
   // Optional signers
   let depositSourceKeypair: Keypair | undefined;
@@ -798,7 +848,7 @@ export const repay = async (abbrev: string, amount: Amount)
 
       payer: wallet.publicKey,
       loanAccount: asset.loanNotePubkey,
-      payerAccount: asset.walletTokenPubkey,
+      payerAccount: depositSourcePubkey,
 
       tokenProgram: TOKEN_PROGRAM_ID,
     },
@@ -1012,4 +1062,37 @@ const buildFaucetAirdropIx = async (
     data: Buffer.from([1, ...amount.toArray("le", 8)]),
     keys
   });
+};
+
+//Take error code and and return error explanation
+export const getErrNameAndMsg = (errCode: number): string => {
+  const code = Number(errCode);
+
+  if (code >=100 && code < 300) {
+    return `This is an Anchor program error code ${code}. Please check here: https://github.com/project-serum/anchor/blob/master/lang/src/error.rs`;
+  }
+
+  for (let i = 0; i < customProgramErrors.length; i++) {
+    const err = customProgramErrors[i];
+    if (err.code === code) {
+      return `\n\nCustom Program Error Code: ${errCode} \n- ${err.name} \n- ${err.msg}`;
+    }
+  } 
+  return `No matching error code description or translation for ${errCode}`;
+};
+
+//get the custom program error code if there's any in the error message and return parsed error code hex to number string
+
+  /**
+   * Get the custom program error code if there's any in the error message and return parsed error code hex to number string
+   * @param errMessage string - error message that would contain the word "custom program error:" if it's a customer program error
+   * @returns [boolean, string] - probably not a custom program error if false otherwise the second element will be the code number in string
+   */
+export const getCustomProgramErrorCode = (errMessage: string): [boolean, string] => {
+  const index = errMessage.indexOf('custom program error:');
+  if(index == -1) {
+    return [false, 'May not be a custom program error']
+  } else {
+    return [true, `${parseInt(errMessage.substring(index + 22,  index + 28).replace(' ', ''), 16)}`];
+  }
 };

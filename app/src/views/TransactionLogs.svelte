@@ -2,8 +2,9 @@
   <title>Jet Protocol | {dictionary[$PREFERRED_LANGUAGE].transactions.title}</title>
 </svelte:head>
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { Datatable, rows } from 'svelte-simple-datatables';
-  import { ASSETS, TRANSACTION_LOGS, PREFERRED_LANGUAGE, WALLET_INIT } from '../store';
+  import { TRANSACTION_LOGS, PREFERRED_LANGUAGE, WALLET_INIT } from '../store';
   import { getTransactionLogs } from '../scripts/jet'; 
   import { totalAbbrev, shortenPubkey } from '../scripts/utils';
   import { dictionary } from '../scripts/localization'; 
@@ -19,6 +20,10 @@
       searchInput: false
     }
   };
+
+  onMount(() => {
+    getTransactionLogs();
+  });
 </script>
 
 <div class="view-container flex justify-center column">

@@ -1,4 +1,4 @@
-import type { AccountInfo, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+import type { AccountInfo, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import type BN from 'bn.js';
 import type WalletAdapter from '../scripts/walletAdapter';
 import type { TokenAmount } from '../scripts/utils';
@@ -388,6 +388,13 @@ export interface IdlMetadata {
   cluster: string;
   market: MarketMetadata;
   reserves: ReserveMetadata[]
+};
+
+//Idl errors
+export interface CustomProgramError {
+  code: number;
+  name: string;
+  msg: string;  
 };
 
 export interface MarketMetadata {
