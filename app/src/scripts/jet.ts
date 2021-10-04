@@ -5,7 +5,7 @@ import { ASSOCIATED_TOKEN_PROGRAM_ID, NATIVE_MINT } from "@solana/spl-token";
 import { AccountLayout as TokenAccountLayout, Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
 import Rollbar from 'rollbar';
 import WalletAdapter from './walletAdapter';
-import type { Reserve, AssetStore, SolWindow, WalletProvider, Wallet, Asset, Market, MathWallet, SolongWallet, CustomProgramError, TransactionLog, IdlMetadata } from '../models/JetTypes';
+import type { Reserve, AssetStore, SolWindow, WalletProvider, Wallet, Asset, Market, MathWallet, SolongWallet, CustomProgramError, TransactionLog } from '../models/JetTypes';
 import { MARKET, WALLET, ASSETS, TRANSACTION_LOGS, PROGRAM, PREFERRED_NODE, WALLET_INIT, CUSTOM_PROGRAM_ERRORS, ANCHOR_WEB3_CONNECTION, ANCHOR_CODER, IDL_METADATA, INIT_FAILED, CURRENT_RESERVE } from '../store';
 import { subscribeToAssets, subscribeToMarket } from './subscribe';
 import { findDepositNoteAddress, findDepositNoteDestAddress, findLoanNoteAddress, findObligationAddress, sendTransaction, transactionErrorToString, findCollateralAddress, SOL_DECIMALS, parseIdlMetadata, sendAllTransactions, InstructionAndSigner, explorerUrl } from './programUtil';
@@ -29,7 +29,6 @@ let idl: any;
 let customProgramErrors: CustomProgramError[];
 let connection: anchor.web3.Connection;
 let coder: anchor.Coder;
-let idlMetadata: IdlMetadata;
 WALLET.subscribe(data => wallet = data);
 ASSETS.subscribe(data => assets = data);
 PROGRAM.subscribe(data => program = data);
@@ -37,7 +36,6 @@ MARKET.subscribe(data => market = data);
 CUSTOM_PROGRAM_ERRORS.subscribe(data => customProgramErrors = data);
 ANCHOR_WEB3_CONNECTION.subscribe(data => connection = data);
 ANCHOR_CODER.subscribe(data => coder = data);
-IDL_METADATA.subscribe(data => idlMetadata = data);
 
 // Development / Devnet identifier
 export const inDevelopment: boolean = jetDev || window.location.hostname.indexOf('devnet') !== -1;
@@ -200,6 +198,10 @@ export const getWalletAndAnchor = async (provider: WalletProvider): Promise<void
 
 // Get Jet transactions and associated UI data
 export const getTransactionLogs = async (): Promise<void> => {
+  if (!wallet?.publicKey) {
+    return;
+  }
+  
   // Reset global store
   TRANSACTION_LOGS.set(null);
   // Establish solana connection and get all confirmed signatures
@@ -247,8 +249,10 @@ export const getTransactionLogs = async (): Promise<void> => {
               log.blockDate = new Date(log.blockTime * 1000).toLocaleDateString();
               // Explorer URL
               log.explorerUrl = explorerUrl(log.signature);
-              // Add tx to logs
-              txLogs.push(log);
+              // If we found mint match, add tx to logs
+              if (log.tokenAbbrev) {
+                txLogs.push(log);
+              }
             }
           }
         }

@@ -9,11 +9,11 @@
     },
     "nav": {
         "cockpit": "Kokpit",
-        "transactions": "Flight Logs",
         "settings": "Ayarlar",
         "collapse": "Kollaps",
         "getCopilotSuggestion": "Yardımcı pilot önerisi alın.",
-        "disconnectWallet": "Cüzdan bağlantısını sonlandır"
+        "disconnectWallet": "Cüzdan bağlantısını sonlandır",
+        "transactions": "Flight Logs"
     },
     "cockpit": {
         "title": "Kokpit",
@@ -67,14 +67,6 @@
         "rejectTrade": "Bu ticaret, sizin yeni teminat oranınızı {{NEW-C-RATIO}}% minimum oranımız olan {{JET MIN C-RATIO}} altına düşürebilir. Borcun oluşturulması için ayrıca bir komisyon daha bulunmaktadır {{ORIGINATION FEE}}%. Hala borç almak istediğinize emin misiniz?",
         "insufficientLamports": "İşlem ücretlerini dahi karşılamayacak kadar çok SOL yatırıyorsunuz. Şu ankinden daha az bir miktar kullanarak yeniden deneyin. ",
         "stillUndercollateralized": "Your new C-ratio of {{NEW-C-RATIO}}% is still under Jet's minimum marketplace collateralization ratio of {{JET MIN C-RATIO}}%. Please consider repaying more to avoid liquidation."
-    },
-    "transactions": {
-      "title": "Flight Logs",
-      "date": "Date",
-      "signature": "Signature",
-      "tradeAction": "Transaction",
-      "tradeAmount": "Amount",
-      "noTrades": "You have no logged transactions with Jet."
     },
     "settings": {
         "title": "Ayarlar",
@@ -145,5 +137,13 @@
             "originationFee": "Bu borca ilişkin {{ORIGINATION FEE}}% kadar oluşturulma komisyonu bulunmaktadır. ",
             "headsup": "Dikkat buraya!"
         }
+    },
+    "transactions": {
+        "title": "Flight Logs",
+        "date": "Date",
+        "signature": "Signature",
+        "tradeAction": "Transaction",
+        "tradeAmount": "Amount",
+        "noTrades": "You have no logged transactions with Jet."
     }
 }

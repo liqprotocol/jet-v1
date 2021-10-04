@@ -9,11 +9,11 @@
     },
     "nav": {
         "cockpit": "Кабина",
-        "transactions": "Flight Logs",
         "settings": "Настройки",
         "collapse": "Свернуть",
         "getCopilotSuggestion": "Get Copilot Suggestion",
-        "disconnectWallet": "Disconnect Wallet"
+        "disconnectWallet": "Disconnect Wallet",
+        "transactions": "Flight Logs"
     },
     "cockpit": {
         "title": "Кабина",
@@ -67,14 +67,6 @@
         "rejectTrade": "Сделка понизит ваш коэфициент залог {{NEW-C-RATIO}}%, что будет ниже \n минимального уровня {{JET MIN C-RATIO}}.",
         "insufficientLamports": "You are depositing all your SOL leaving you no lamports for transaction fees! Please try again with a slightly lower input amount.",
         "stillUndercollateralized": "Your new C-ratio of {{NEW-C-RATIO}}% is still under Jet's minimum marketplace collateralization ratio of {{JET MIN C-RATIO}}%. Please consider repaying more to avoid liquidation."
-    },
-    "transactions": {
-      "title": "Flight Logs",
-      "date": "Date",
-      "signature": "Signature",
-      "tradeAction": "Transaction",
-      "tradeAmount": "Amount",
-      "noTrades": "You have no logged transactions with Jet."
     },
     "settings": {
         "title": "Настройки",
@@ -145,5 +137,13 @@
             "originationFee": "Этот займ выдается с комиссией {{ORIGINATION FEE}}%",
             "headsup": "Heads up!"
         }
+    },
+    "transactions": {
+        "title": "Flight Logs",
+        "date": "Date",
+        "signature": "Signature",
+        "tradeAction": "Transaction",
+        "tradeAmount": "Amount",
+        "noTrades": "You have no logged transactions with Jet."
     }
 }

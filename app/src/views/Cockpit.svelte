@@ -35,7 +35,6 @@
   let disabledMessage: string = '';
   let reserveDetail: Reserve | null = null;
   let sendingTrade: boolean = false;
-  let showAirdrop: boolean = inDevelopment || window.location.hostname.indexOf('devnet') !== -1;
 
   // Datatable settings
   let tableData: Reserve[] = [];
@@ -118,7 +117,7 @@
       } else {
         disabledMessage = disabledMessage = dictionary[$PREFERRED_LANGUAGE].cockpit.belowMinCRatio;
       }
-    } else if ($TRADE_ACTION === 'borrow' && (noDeposits || belowMinCRatio || assetsAreCurrentDeposit[$CURRENT_RESERVE.abbrev] || !$CURRENT_RESERVE.availableLiquidity.uiAmountFloat)) {
+    } else if ($TRADE_ACTION === 'borrow' && (noDeposits || belowMinCRatio || assetsAreCurrentDeposit[$CURRENT_RESERVE.abbrev] || !$CURRENT_RESERVE.availableLiquidity?.uiAmountFloat)) {
       disabledInput = true;
       if (noDeposits) {
         disabledMessage = disabledMessage = dictionary[$PREFERRED_LANGUAGE].cockpit.noDepositsForBorrow;
@@ -202,14 +201,14 @@
     tableData = [];
     for (let r in $MARKET.reserves) {
       // Market data
-      marketTVL += $MARKET.reserves[r].marketSize.muln($MARKET.reserves[r].price).uiAmountFloat;
+      marketTVL += $MARKET.reserves[r].marketSize.muln($MARKET.reserves[r].price)?.uiAmountFloat;
       if ($MARKET.reserves[r]) {
         tableData.push($MARKET.reserves[r]);
       }
 
       // Position balances
-      collateralBalances[r] = $ASSETS?.tokens[r]?.collateralBalance.uiAmountFloat ?? 0;
-      loanBalances[r] = $ASSETS?.tokens[r]?.loanBalance.uiAmountFloat ?? 0;
+      collateralBalances[r] = $ASSETS?.tokens[r]?.collateralBalance?.uiAmountFloat ?? 0;
+      loanBalances[r] = $ASSETS?.tokens[r]?.loanBalance?.uiAmountFloat ?? 0;
 
       // Deposit data
      if ($ASSETS) {
@@ -233,8 +232,8 @@
       assetsAreCurrentDeposit[r] = collateralBalances[r] > 0;
       assetsAreCurrentBorrow[r] = loanBalances[r] > 0;
       maxBorrowAmounts[r] = ((obligation.depositedValue / $MARKET.minColRatio) - obligation.borrowedValue) / $MARKET.reserves[r].price;
-      if (maxBorrowAmounts[r] > $MARKET.reserves[r].availableLiquidity.uiAmountFloat) {
-        maxBorrowAmounts[r] = $MARKET.reserves[r].availableLiquidity.uiAmountFloat;
+      if (maxBorrowAmounts[r] > $MARKET.reserves[r].availableLiquidity?.uiAmountFloat) {
+        maxBorrowAmounts[r] = $MARKET.reserves[r].availableLiquidity?.uiAmountFloat;
       }
     };
 
@@ -603,7 +602,7 @@
             </td>
             <td on:click={() => changeReserve($rows[i])}>
               {totalAbbrev(
-                $rows[i].availableLiquidity.uiAmountFloat,
+                $rows[i].availableLiquidity?.uiAmountFloat,
                 $rows[i].price,
                 $NATIVE,
                 2
@@ -923,7 +922,7 @@
   .trade-action-select {
     width: calc(25% - 1px);
     padding: var(--spacing-sm) 0;
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.25);
     opacity: var(--disabled-opacity);
     cursor: pointer;
   }
@@ -933,9 +932,9 @@
   }
   .trade-action-select p {
     position: relative;
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 0.5px;
-    line-height: 10px;
+    line-height: 13px;
     color: var(--white);
   }
   .trade-action-select p::after {

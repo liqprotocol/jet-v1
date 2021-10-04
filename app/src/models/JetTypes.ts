@@ -1,4 +1,4 @@
-import type { AccountInfo, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+import type { AccountInfo, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import type BN from 'bn.js';
 import type WalletAdapter from '../scripts/walletAdapter';
 import type { TokenAmount } from '../scripts/utils';

@@ -111,6 +111,5 @@
   p {
     font-size: 14px;
     text-align: center;
-    opacity: 0.8;
   }
 </style>
