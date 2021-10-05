@@ -2,7 +2,6 @@
   <title>Jet Protocol | {dictionary[$PREFERRED_LANGUAGE].transactions.title}</title>
 </svelte:head>
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { Datatable, rows } from 'svelte-simple-datatables';
   import { TRANSACTION_LOGS, PREFERRED_LANGUAGE, WALLET_INIT } from '../store';
   import { getTransactionLogs } from '../scripts/jet'; 
@@ -14,16 +13,19 @@
   // Datatable Settings
   const tableSettings: any = {
     sortable: false,
-    pagination: false,
+    pagination: true,
+    rowPerPage: 10,
     scrollY: false,
     blocks: {
       searchInput: false
+    },
+    labels: {
+      noRows: dictionary[$PREFERRED_LANGUAGE].transactions.noTrades,
+      info: dictionary[$PREFERRED_LANGUAGE].transactions.entries,
+      previous: '<',
+      next: '>'
     }
   };
-
-  onMount(() => {
-    getTransactionLogs();
-  });
 </script>
 
 <div class="view-container flex justify-center column">
@@ -58,49 +60,40 @@
         <div class="datatable-divider">
         </div>
         <tbody>
-          {#if $TRANSACTION_LOGS.length}
-            {#each $rows as row, i}
-              <tr class="datatable-spacer">
-                <td><!-- Extra Row for spacing --></td>
-              </tr>
-              <tr on:click={() => window.open($rows[i].explorerUrl, '_blank')}>
-                <td>
-                  {$rows[i].blockDate}
-                </td>
-                <td style="color: var(--success);">
-                  {shortenPubkey($rows[i].signature, 8)}
-                </td>
-                <td class="reserve-detail"
-                  style="text-align: center !important;">
-                  {$rows[i].tradeAction}
-                </td>
-                <td>
-                  {totalAbbrev(
-                    Math.abs($rows[i].tradeAmount.uiAmountFloat),
-                    $rows[i].tokenPrice,
-                    true,
-                    $rows[i].tokenDecimals
-                  )}&nbsp;
-                  {$rows[i].tokenAbbrev}
-                  </td>
-                <td>
-                  <i class="text-gradient jet-icons">
-                    ➜
-                  </i>
-                </td>
-              </tr>
-              <tr class="datatable-spacer">
-                <td><!-- Extra Row for spacing --></td>
-              </tr>
-            {/each}
-          {:else}
-            <tr>
-              <td></td>
+          {#each $rows as row, i}
+            <tr class="datatable-spacer">
+              <td><!-- Extra Row for spacing --></td>
+            </tr>
+            <tr on:click={() => window.open($rows[i].explorerUrl, '_blank')}>
               <td>
-                {dictionary[$PREFERRED_LANGUAGE].transactions.noTrades} 
+                {$rows[i].blockDate}
+              </td>
+              <td style="color: var(--success);">
+                {shortenPubkey($rows[i].signature, 8)}
+              </td>
+              <td class="reserve-detail"
+                style="text-align: center !important;">
+                {$rows[i].tradeAction}
+              </td>
+              <td>
+                {totalAbbrev(
+                  Math.abs($rows[i].tradeAmount.uiAmountFloat),
+                  $rows[i].tokenPrice,
+                  true,
+                  $rows[i].tokenDecimals
+                )}&nbsp;
+                {$rows[i].tokenAbbrev}
+                </td>
+              <td>
+                <i class="text-gradient jet-icons">
+                  ➜
+                </i>
               </td>
             </tr>
-          {/if}
+            <tr class="datatable-spacer">
+              <td><!-- Extra Row for spacing --></td>
+            </tr>
+          {/each}
         </tbody>
       </Datatable>
     </div>
