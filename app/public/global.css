@@ -42,6 +42,8 @@
   --nav-width: 60px;
   --mobile-nav-height: 60px;
 
+  --transition: all 0.1s;
+
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 12px;
@@ -98,6 +100,10 @@ span {
   opacity: var(--disabled-opacity);
   font-size: 9px !important;
   cursor: pointer;
+  transition: var(--transition);
+}
+.info:hover {
+  opacity: 1;
 }
 .info:hover {
   opacity: 1;
