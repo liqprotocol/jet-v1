@@ -140,7 +140,7 @@
     width: 70px;
     height: auto;
     margin: var(--spacing-md);
-    padding: 15px;
+    padding: 10px;
     border-radius: 100px;
     background: var(--white);
     box-shadow: var(--neu-shadow-inset);
@@ -155,6 +155,8 @@
   }
   span {
     max-width: 400px;
+    line-height: 16px;
+    opacity: 1;
   }
 
   @media screen and (max-width: 1100px) {

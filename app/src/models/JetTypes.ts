@@ -1,4 +1,4 @@
-import type { AccountInfo, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+import type { AccountInfo, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import type BN from 'bn.js';
 import type WalletAdapter from '../scripts/walletAdapter';
 import type { TokenAmount } from '../scripts/utils';
@@ -390,6 +390,13 @@ export interface IdlMetadata {
   reserves: ReserveMetadata[]
 };
 
+//Idl errors
+export interface CustomProgramError {
+  code: number;
+  name: string;
+  msg: string;  
+};
+
 export interface MarketMetadata {
   market: PublicKey,
   marketAuthority: PublicKey,
@@ -424,4 +431,10 @@ export interface ReserveMetadata {
     dexSwapTokens: number,
     dexOpenOrders: number,
   },
+};
+
+// Notifications
+export interface Notification {
+  success: boolean,
+  text: string
 };
