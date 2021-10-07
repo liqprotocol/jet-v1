@@ -159,6 +159,15 @@
     opacity: 1;
   }
 
+  a, a:visited {
+    color: inherit;
+
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
   @media screen and (max-width: 1100px) {
     img {
       width: 45px;
