@@ -64,6 +64,17 @@
               ({$PING}ms)
             </p>
           {/if}
+          {#if $PREFERRED_NODE}
+            <p class="reset-rpc bicyclette-bold text-gradient"
+              on:click={() => {
+                localStorage.removeItem('jetPreferredNode');
+                PING.set(0);
+                getMarketAndIDL();
+                getTransactionLogs();
+              }}>
+              {dictionary[$PREFERRED_LANGUAGE].settings.reset.toUpperCase()}
+            </p>
+          {/if}
         </div>
       </div>
       <div class="submit-input flex align-center justify-center">
@@ -99,6 +110,31 @@
               getTransactionLogs();
             }} />
         {/if}
+        </div>
+      </div>
+      <div class="submit-input flex align-center justify-center">
+        <input
+          bind:value={rpcNodeInput}
+          placeholder={inputError ?? 'ex: https://api.devnet.solana.com/'}
+          class={inputError ? 'input-error' : ''}
+          class:active={rpcNodeInput}
+          type="text"
+          on:keypress={(e) => {
+            if (e.code === 'Enter') {
+              checkRPC();
+            }
+          }}
+          on:click={() => {
+            inputError = null;
+          }}
+        />
+        <div class="submit-input-btn flex align-center justify-center"
+          on:click={() => checkRPC()}>
+          <i class="jet-icons"
+            title="Save">
+            ➜
+          </i>
+        </div>
       </div>
     </div>
     <div class="divider"></div>
@@ -217,6 +253,10 @@
     border-radius: 50px;
     margin: 0 var(--spacing-xs) 0 var(--spacing-sm);
     opacity: var(--disabled-opacity);
+  }
+  .reset-rpc {
+    margin: var(--spacing-xs) 0 0 var(--spacing-xs);
+    cursor: pointer;
   }
   input {
     width: 200px;
