@@ -100,41 +100,6 @@
             ➜
           </i>
         </div>
-        {#if $PREFERRED_NODE}
-          <Button small
-            text={dictionary[$PREFERRED_LANGUAGE].settings.reset}
-            onClick={() => {
-              localStorage.removeItem('jetPreferredNode');
-              PING.set(0);
-              getMarketAndIDL();
-              getTransactionLogs();
-            }} />
-        {/if}
-        </div>
-      </div>
-      <div class="submit-input flex align-center justify-center">
-        <input
-          bind:value={rpcNodeInput}
-          placeholder={inputError ?? 'ex: https://api.devnet.solana.com/'}
-          class={inputError ? 'input-error' : ''}
-          class:active={rpcNodeInput}
-          type="text"
-          on:keypress={(e) => {
-            if (e.code === 'Enter') {
-              checkRPC();
-            }
-          }}
-          on:click={() => {
-            inputError = null;
-          }}
-        />
-        <div class="submit-input-btn flex align-center justify-center"
-          on:click={() => checkRPC()}>
-          <i class="jet-icons"
-            title="Save">
-            ➜
-          </i>
-        </div>
       </div>
     </div>
     <div class="divider"></div>
