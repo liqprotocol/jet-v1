@@ -45,19 +45,27 @@ anchor test
 
 ## Run Frontend
 
-First startup a local validator and deploy
+### Initial localnet setup - startup a local validator and deploy
 
 ```
 npm install
 cd scripts
 ./localnet-start.sh
-vi app/.env # Set IDL = localnet
 ```
 
-Install any other NPM dependencies
+Set up frontend app environment variable to use localnet
+```
+vi ../app/.env # Set IDL = localnet
+```
+
+Run `ctrl-c.` to kill the solana-test-validator process to stop the localnet
+
+### Startup a local validator and deploy
+
+Install any other NPM dependencies in the app directory
 
 ```
-cd app
+cd ../app
 npm install
 ```
 
